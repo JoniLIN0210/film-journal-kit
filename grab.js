@@ -61,15 +61,32 @@
         '<a class="b solid" href="https://movie.douban.com/mine?status=collect">打开我的“看过”页面</a><button class="ok-btn">取消</button>');
       return;
     }
+    // Douban sometimes asks a browser that reads many pages to prove it is human. When that happens we pause,
+    // let the user pass the check in another tab (same cookies), then carry on from where we were.
+    const SKIP = new Error('skip');
+    let pending = null;
+    const verify = () => pending || (pending = new Promise((resolve) => {
+      const keep = { msg: $('.msg').textContent, row: $('.row').innerHTML };
+      say('豆瓣想确认一下你是真人（读取得比较快时会这样）。请点“去验证”，在新打开的页面里完成验证，然后回到这里点“继续”。已经读到的不会丢。');
+      $('.row').innerHTML = '<a class="b solid" href="https://movie.douban.com/" target="_blank" rel="noopener">去验证 ↗</a><button class="go">我已完成，继续</button><button class="skip">跳过，直接生成</button>';
+      const done = (v) => { pending = null; say(keep.msg); $('.row').innerHTML = keep.row; $('.stop').onclick = () => { cancelled = true; close(); }; resolve(v); };
+      $('.go').onclick = () => done('go');
+      $('.skip').onclick = () => done('skip');
+    }));
+    const blockedRes = (res, html) => /misc\/sorry|sec\.douban\.com/.test(res.url) || res.status === 403 || /<title>\s*禁止访问/.test(html);
     const fetchDoc = async (url) => {
-      const res = await fetch(url, { credentials: 'include' });
-      const html = await res.text();
-      return { res, doc: new DOMParser().parseFromString(html, 'text/html'), html };
+      while (true) {
+        check();
+        const res = await fetch(url, { credentials: 'include' });
+        const html = await res.text();
+        if (!blockedRes(res, html)) return { res, doc: new DOMParser().parseFromString(html, 'text/html'), html };
+        if ((await verify()) === 'skip') throw SKIP;
+      }
     };
     say('正在确认登录状态…');
     let uid = (location.pathname.match(/^\/people\/([^/]+)\/collect/) || [])[1];
     if (!uid) {
-      const r = await fetch('/mine?status=collect', { credentials: 'include' });
+      const { res: r } = await fetchDoc('/mine?status=collect');
       uid = (r.url.match(/\/people\/([^/]+)\//) || [])[1];
       if (!uid) {
         const nav = document.querySelector('.nav-user-account a[href*="/people/"], a[href*="douban.com/people/"]');
@@ -166,10 +183,13 @@
       for (let attempt = 0; attempt < 2 && !blocked; attempt++) {
         try {
           const { res, doc } = await fetchDoc(`/subject/${f.id}/`);
-          if (/sec\.douban\.com|misc\/sorry|accounts\.douban/.test(res.url) || res.status === 403) { blocked = true; return; }
+          if (/accounts\.douban/.test(res.url)) { blocked = true; return; }
           const d = parseDetail(doc, f);
           if (d) { f.detail = d; return; }
-        } catch { /* retry */ }
+        } catch (e) {
+          if (e === SKIP) { blocked = true; return; }
+          if (cancelled) throw e;
+        }
         await sleep(1500);
       }
     };
@@ -254,6 +274,7 @@
       (blocked || detailed < list.length ? ` 有 ${list.length - detailed} 部的详情这次没读到（豆瓣暂时拦截了），用了列表页的简要信息；过一段时间再点一次按钮会更完整。` : ''),
       `<a class="b solid" href="${url}" download="${filename}">没有自动下载？点这里</a><button class="ok-btn">关闭</button>`);
   } catch (err) {
+    if (err && err.message === 'skip') { fail('豆瓣需要先完成真人验证才能继续读取。请打开豆瓣完成验证，过一会儿再点一次收藏栏里的按钮。'); return; }
     if (!cancelled) fail('出了点问题：' + (err && err.message || err) + ' 刷新页面后可以再点一次按钮重试。');
   }
 
