@@ -95,6 +95,11 @@ function sealHTML() {
     <text x="100" y="104" text-anchor="middle" dominant-baseline="central" font-size="62" font-family="Songti SC, serif" font-weight="900" fill="var(--on-hl)">${esc(ME_MARK)}</text></svg>`;
 }
 document.querySelectorAll('[data-me]').forEach((el) => { el.textContent = ME; });
+/* poster archive link, only when this journal was generated with posters */
+if (PROFILE.posters && !/posters\.html/.test(location.pathname)) {
+  const nav = document.querySelector('.bar nav'), first = nav && nav.querySelector('.pill');
+  if (first) first.insertAdjacentHTML('beforebegin', '<a href="posters.html">海报馆</a>');
+}
 document.querySelectorAll('.seal').forEach((el) => { el.innerHTML = sealHTML(); });
 document.title = document.title.replace('{me}', ME);
 (() => {

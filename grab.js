@@ -22,9 +22,10 @@
     h1{font:900 40px/1.1 'Songti SC','Noto Serif SC','STSong',serif;margin:14px 0 6px;letter-spacing:.02em}
     .msg{font-size:15px;line-height:1.7;min-height:52px;margin:0 0 22px;color:rgba(255,255,255,.88)}
     .track{height:6px;background:rgba(255,255,255,.22)}.fill{height:100%;width:0;background:#dfff4f;transition:width .3s}
-    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;font:12px/1.4 'SF Mono',Menlo,monospace;color:rgba(255,255,255,.5)}
+    .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px;font:12px/1.4 'SF Mono',Menlo,monospace;color:rgba(255,255,255,.5)}
     .steps .on{color:#dfff4f}.steps .ok{color:#fff}
     .row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+    .row button small{display:block;font:400 11px/1.2 'SF Mono',Menlo,monospace;margin-top:6px;opacity:.75;letter-spacing:.04em}
     button,a.b{font:600 14px/1 'Helvetica Neue','PingFang SC',sans-serif;padding:13px 20px;border:1.5px solid #fff;background:none;color:#fff;cursor:pointer;text-decoration:none}
     .solid{background:#dfff4f;border-color:#dfff4f;color:#0b0b0c}
     .note{font-size:12px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.6}
@@ -34,7 +35,7 @@
     <h1>正在整理你的观影志</h1>
     <p class="msg">准备中…</p>
     <div class="track"><div class="fill"></div></div>
-    <div class="steps"><span>01 片单</span><span>02 详情</span><span>03 海报</span><span>04 打包</span></div>
+    <div class="steps"><span>01 片单</span><span>02 详情</span><span>03 封面</span><span>04 海报馆</span><span>05 打包</span></div>
     <div class="row"><button class="stop">取消</button></div>
     <p class="note">全部在你自己的浏览器里完成，不上传任何数据。过程中请不要关闭或刷新这个页面。</p>
   </div></div>`;
@@ -98,6 +99,24 @@
       return;
     }
 
+    /* ---------------------------------------------------------------- choose: journal only, or journal + poster archive */
+    const withPosters = await new Promise((resolve) => {
+      $('h1').textContent = '生成你的观影志';
+      say('选一种。两种都会读取你的“看过”列表和每部影片的详情；海报馆会再为每部影片收集豆瓣上最受欢迎的几张海报（不同国家、不同版本）。');
+      $('.row').innerHTML = '<button class="solid m1">观影志 + 海报馆<small>用时约多一倍</small></button><button class="m0">只要观影志<small>300 部约 7 分钟</small></button><button class="x">取消</button>';
+      $('.m1').onclick = () => resolve(true);
+      $('.m0').onclick = () => resolve(false);
+      $('.x').onclick = () => { cancelled = true; close(); resolve(false); };
+    });
+    check();
+    $('h1').textContent = withPosters ? '正在整理你的观影志和海报馆' : '正在整理你的观影志';
+    $('.row').innerHTML = '<button class="stop">取消</button>';
+    $('.stop').onclick = () => { cancelled = true; close(); };
+    if (!withPosters) root.querySelectorAll('.steps span')[3].style.visibility = 'hidden';
+    // progress bar ranges per phase
+    const R = withPosters ? { list: 0.06, d: [0.06, 0.4], c: [0.4, 0.48], g: [0.48, 0.96] } : { list: 0.1, d: [0.1, 0.65], c: [0.65, 0.92] };
+    const span = (r, f) => r[0] + (r[1] - r[0]) * f;
+
     /* ---------------------------------------------------------------- 1. the 看过 list */
     step(0);
     const listUrl = (st) => `/people/${uid}/collect?start=${st}&sort=time&rating=all&filter=all&mode=grid`;
@@ -137,7 +156,7 @@
       items.forEach((it) => films.set(it.id, it));
       start += 15;
       say(`正在读取你的“看过”列表：${Math.min(films.size, total)} / ${total}`);
-      bar(0.1 * Math.min(1, films.size / total));
+      bar(R.list * Math.min(1, films.size / total));
       if (start >= total) break;
       await sleep(700);
     }
@@ -202,12 +221,12 @@
         await fetchDetail(f);
         done++;
         say(`正在读取每部影片的详情：${done} / ${list.length}`);
-        bar(0.1 + 0.55 * done / list.length);
+        bar(span(R.d, done / list.length));
         await sleep(350);
       }
     }));
 
-    /* ---------------------------------------------------------------- 3. posters, embedded so the site works offline */
+    /* ---------------------------------------------------------------- 3. covers, embedded so the site works offline */
     step(2);
     const toDataUrl = (blob) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => res(''); r.readAsDataURL(blob); });
     let pdone = 0;
@@ -223,12 +242,70 @@
           } catch { /* poster stays empty: the page shows a title card instead */ }
         }
         pdone++;
-        if (pdone % 5 === 0 || pdone === list.length) { say(`正在下载海报：${pdone} / ${list.length}`); bar(0.65 + 0.25 * pdone / list.length); }
+        if (pdone % 5 === 0 || pdone === list.length) { say(`正在下载封面：${pdone} / ${list.length}`); bar(span(R.c, pdone / list.length)); }
       }
     }));
 
-    /* ---------------------------------------------------------------- 4. build data + zip */
-    step(3);
+    /* ---------------------------------------------------------------- 4. poster archive: the most-liked posters of each film */
+    const PER_FILM = 5, gallery = {}, galleryFiles = {};
+    let gcount = 0;
+    if (withPosters) {
+      step(3);
+      // Douban's per-film poster page, default order = most liked. Each item: "正式海报 美国", "2000x2963", "114回应".
+      const parsePhotos = (doc) => [...doc.querySelectorAll('ul.poster-col3 > li[data-id]')].map((li) => {
+        const img = li.querySelector('.cover img');
+        const nameEl = li.querySelector('.name');
+        const label = nameEl ? [...nameEl.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ').replace(/\s+/g, ' ').trim() : '';
+        const [k, ...g] = label.split(' ');
+        const dim = (txt(li.querySelector('.prop')).match(/(\d+)\s*x\s*(\d+)/) || []).slice(1).map(Number);
+        const c = parseInt((txt(nameEl && nameEl.querySelector('a')).match(/\d+/) || ['0'])[0], 10) || 0;
+        return { id: li.dataset.id, src: img && img.src, k: k || '', g: g.join(' '), w: dim[0] || 0, h: dim[1] || 0, c };
+      }).filter((p) => p.id && p.src);
+      // shrink to ~420px wide JPEG: keeps the zip small (a full set is a few hundred posters)
+      const shrink = async (blob) => {
+        try {
+          const bmp = await createImageBitmap(blob);
+          const W = Math.min(420, bmp.width), H = Math.round(bmp.height * W / bmp.width);
+          const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+          cv.getContext('2d').drawImage(bmp, 0, 0, W, H);
+          if (bmp.close) bmp.close();
+          return (await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8))) || blob;
+        } catch { return blob; }
+      };
+      let gdone = 0, gstop = false;
+      cursor = 0;
+      await Promise.all([0, 1].map(async () => {
+        while (cursor < list.length && !gstop) {
+          check();
+          const f = list[cursor++];
+          try {
+            const { doc } = await fetchDoc(`/subject/${f.id}/photos?type=R&start=0&sortby=like&size=a&subtype=a`);
+            const ps = parsePhotos(doc).slice(0, PER_FILM);
+            await Promise.all(ps.map(async (p) => {
+              try {
+                const r = await fetch(p.src, { mode: 'cors', credentials: 'omit' });
+                if (!r.ok) return;
+                const b = await shrink(await r.blob());
+                if (b.size < 1500) return;
+                p.f = `posters/p${p.id}.jpg`;
+                galleryFiles[p.f] = new Uint8Array(await b.arrayBuffer());
+              } catch { /* skip this one */ }
+            }));
+            const kept = ps.filter((p) => p.f).map(({ id, k, g, w, h, c, f: file }) => ({ id, k, g, w, h, c, f: file }));
+            if (kept.length) { gallery[f.id] = kept; gcount += kept.length; }
+          } catch (e) {
+            if (e === SKIP) gstop = true; else if (cancelled) throw e;
+          }
+          gdone++;
+          say(`正在收集海报馆：${gdone} / ${list.length} 部，已收集 ${gcount} 张`);
+          bar(span(R.g, gdone / list.length));
+          await sleep(350);
+        }
+      }));
+    }
+
+    /* ---------------------------------------------------------------- 5. build data + zip */
+    step(4);
     say('正在打包你的观影志…');
     const rows = list.map((f) => {
       const d = f.detail || parseIntro(f);
@@ -242,21 +319,23 @@
       };
     }).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
     const now = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
-    const profile = { id: uid, name, updated: now, url: `https://www.douban.com/people/${uid}/` };
+    const profile = { id: uid, name, updated: now, url: `https://www.douban.com/people/${uid}/`, posters: gcount };
     const dataJs = `window.PROFILE = ${JSON.stringify(profile)};\nwindow.MOVIES = ${JSON.stringify(rows)};\n`;
 
-    if (window.__FJ_SINK) { await window.__FJ_SINK({ profile, rows, dataJs, detailed: list.filter((f) => f.detail).length, blocked }); finish('测试完成', `共 ${rows.length} 部`); return; }
+    if (window.__FJ_SINK) { await window.__FJ_SINK({ profile, rows, dataJs, gallery, galleryFiles, detailed: list.filter((f) => f.detail).length, blocked }); finish('测试完成', `共 ${rows.length} 部`); return; }
 
     const files = {};
-    for (const p of ['index.html', 'report.html', 'assets/style.css', 'assets/common.js']) {
+    for (const p of ['index.html', 'report.html', 'posters.html', 'assets/style.css', 'assets/common.js']) {
       const r = await fetch(BASE + 'template/' + p, { cache: 'no-store' });
       if (!r.ok) throw new Error('模板文件下载失败（' + p + '），请检查网络后重试。');
       files[p] = await r.text();
     }
     files['data/movies.js'] = dataJs;
+    files['data/posters.js'] = `window.POSTERS = ${JSON.stringify(gallery)};\n`;
+    Object.assign(files, galleryFiles);
     files['README.txt'] = '\ufeff' + [
       `${name} 的观影志 · 生成于 ${now}`, '',
-      '打开方式：双击 index.html（主页）或 report.html（年度报告）。',
+      '打开方式：双击 index.html（主页）或 report.html（年度报告）' + (gcount ? '，海报馆是 posters.html。' : '。'),
       '看其他年份的年度报告：在 report.html 的地址末尾加上 ?y=2025 这样的年份。',
       '分享：页面右上角“分享”可以生成 1080px 宽的长图。',
       '更新：以后在豆瓣标记了新的影视，再点一次收藏栏里的按钮，下载新的一份替换掉这个文件夹即可。',
@@ -270,7 +349,7 @@
     const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     const detailed = list.filter((f) => f.detail).length;
     finish('完成了 🎬',
-      `共 ${rows.length} 部影视，已下载「${filename}」（${(zip.size / 1048576).toFixed(1)} MB）。解压后双击里面的 index.html 就能打开你的观影志。` +
+      `共 ${rows.length} 部影视${gcount ? `，海报馆收集了 ${gcount} 张海报` : ''}，已下载「${filename}」（${(zip.size / 1048576).toFixed(1)} MB）。解压后双击里面的 index.html 就能打开你的观影志。` +
       (blocked ? ` 有 ${list.length - detailed} 部的详情这次没读到（豆瓣暂时拦截了），用了列表页的简要信息；过一段时间再点一次按钮会更完整。`
         : detailed < list.length ? ` 有 ${list.length - detailed} 部的详情页打不开（通常是豆瓣已下架的条目），用了列表页的简要信息。` : ''),
       `<a class="b solid" href="${url}" download="${filename}">没有自动下载？点这里</a><button class="ok-btn">关闭</button>`);

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{me} 的海报馆</title>
+<meta name="description" content="看过的每一部影视，它们在不同国家、不同时期的海报。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="pa">
+<header class="block hero pa-hero t-black">
+  <div class="wrap">
+    <div class="bar">
+      <a class="brand" href="index.html"><span class="me" data-me></span>的观影志<i>Film Journal</i></a>
+      <nav class="mono">
+        <a href="#icons">最受关注</a><a href="#versions">各国版本</a><a href="#wall">海报墙</a>
+        <a class="pill" href="index.html">← 主页</a>
+        <a class="pill solid" href="report.html"><span data-ry></span> 年度报告</a>
+      </nav>
+    </div>
+  </div>
+  <div class="wrap stage">
+    <div class="mono" id="pa-vol" style="margin-bottom:18px"></div>
+    <h1>海报馆</h1>
+    <div class="script">The Poster Archive</div>
+    <div class="intro">
+      <p id="pa-intro"></p>
+      <div class="mono" id="pa-asof"></div>
+    </div>
+  </div>
+  <div class="pa-strip" aria-hidden="true"><div class="track" id="pa-strip"></div></div>
+</header>
+
+<main>
+  <section class="t-black" id="icons">
+    <div class="wrap">
+      <div class="head"><div class="idx mono">01 — Icons</div><h2>最受关注<i>the most talked-about</i></h2><p id="icons-p"></p></div>
+      <div class="pa-icons" id="icons-grid"></div>
+    </div>
+  </section>
+
+  <section class="t-white" id="versions">
+    <div class="wrap">
+      <div class="head"><div class="idx mono">02 — Versions</div><h2>一部电影，几个国家<i>one film, many faces</i></h2><p id="versions-p"></p></div>
+      <div class="pa-versions" id="versions-list"></div>
+      <div class="pa-regions" id="regions"></div>
+    </div>
+  </section>
+
+  <section class="t-black" id="wall">
+    <div class="wrap">
+      <div class="head"><div class="idx mono">03 — The Wall</div><h2>海报墙<i>every poster</i></h2><p id="wall-p"></p></div>
+      <div class="controls pa-controls">
+        <div class="row" id="chips-year"></div>
+        <div class="row">
+          <span id="chips-kind" class="row"></span>
+          <span class="sep"></span>
+          <select id="f-region" aria-label="地区版本"></select>
+          <select id="f-view" aria-label="排列">
+            <option value="film">按影片</option><option value="tile">全部平铺</option>
+          </select>
+        </div>
+      </div>
+      <div id="wall-body"></div>
+      <button class="more" id="more" hidden>LOAD MORE　继续</button>
+    </div>
+  </section>
+</main>
+
+<dialog class="pa-box" id="box" aria-label="海报大图">
+  <button class="close" data-x aria-label="关闭">×</button>
+  <button class="nav prev" data-step="-1" aria-label="上一张">←</button>
+  <button class="nav next" data-step="1" aria-label="下一张">→</button>
+  <figure><img id="box-img" alt=""><figcaption id="box-cap"></figcaption></figure>
+</dialog>
+
+<footer class="t-black"><div class="wrap mono"><span>Curated by <a id="me-link" target="_blank" rel="noopener" data-me></a> — The Poster Archive</span><span>海报来自豆瓣，版权归各片方与设计师所有 · 仅供个人收藏</span></div></footer>
+
+<script>/* always load the freshest data after an update */ document.write('<script src="data/movies.js?v=' + Date.now() + '"><\/script><script src="data/posters.js?v=' + Date.now() + '"><\/script>');</script>
+<script src="assets/common.js"></script>
+<script>
+const P = window.POSTERS || {};
+const byId = Object.fromEntries(M.map((m) => [m.id, m]));
+/* one flat list; each poster knows its film and its rank inside that film (0 = most liked on Douban) */
+const ALL = [];
+const films = M.filter((m) => P[m.id] && P[m.id].length).sort(byDateDesc);
+films.forEach((m) => P[m.id].forEach((p, i) => ALL.push({ ...p, m, rank: i })));
+const years = [...new Set(films.map((m) => m.date.slice(0, 4)).filter(Boolean))].sort().reverse();
+const RY = years[0] || '';
+document.querySelectorAll('[data-ry]').forEach((el) => { el.textContent = RY; });
+$('#me-link').href = PROFILE.url || '#';
+
+const imgHTML = (p, cls = '') => `<button class="pa-p ${cls}" data-pid="${esc(p.id)}" style="aspect-ratio:${p.w && p.h ? Math.min(0.85, Math.max(0.55, p.w / p.h)).toFixed(3) : '0.68'}"><img loading="lazy" src="${esc(p.f)}" alt="《${esc(p.m.t)}》${esc(p.k || '海报')}"></button>`;
+const capText = (p) => [p.k, p.g].filter(Boolean).join(' · ') || '海报';
+const regions = (() => { const t = {}; ALL.forEach((p) => { if (p.g) t[p.g] = (t[p.g] || 0) + 1; }); return Object.entries(t).sort((a, b) => b[1] - a[1]); })();
+
+if (!ALL.length) {
+  $('#pa-intro').textContent = '这一份观影志还没有收集海报。重新点一次收藏栏里的按钮，选择“观影志 + 海报馆”即可生成。';
+  ['#icons', '#versions', '#wall'].forEach((s) => { $(s).hidden = true; });
+} else {
+  /* hero */
+  $('#pa-vol').textContent = `Vol. ${years[years.length - 1]} — ${years[0]}　/　${ME} 的海报收藏`;
+  $('#pa-intro').innerHTML = `从 <b>${films.length}</b> 部看过的影视里，收集了 <b>${ALL.length}</b> 张海报，来自 <b>${regions.length}</b> 个国家和地区的版本。每部按豆瓣用户的喜欢排序，留下最受欢迎的几张。`;
+  $('#pa-asof').textContent = `Updated ${(PROFILE.updated || '').replace(/-/g, '.')}`;
+  const strip = films.slice(0, 16).map((m) => ALL.find((p) => p.m === m)).filter(Boolean);
+  $('#pa-strip').innerHTML = [...strip, ...strip].map((p) => `<img src="${esc(p.f)}" alt="">`).join('');
+
+  /* 01 icons: most discussed posters overall (Douban reply count), one per film */
+  const seen = new Set();
+  const icons = ALL.slice().sort((a, b) => (b.c || 0) - (a.c || 0)).filter((p) => !seen.has(p.m.id) && seen.add(p.m.id)).slice(0, 9);
+  $('#icons-p').textContent = '你看过的影视里，在豆瓣上被讨论最多的海报，每部选一张。';
+  $('#icons-grid').innerHTML = icons.map((p, i) => `<figure class="pa-icon${i === 0 ? ' lead' : ''}">${imgHTML(p)}
+    <figcaption><span class="n">${String(i + 1).padStart(2, '0')}</span><b>${esc(p.m.t)}</b><span class="mono">${esc(capText(p))}${p.c ? ` · ${p.c} 条回应` : ''}</span></figcaption></figure>`).join('');
+
+  /* 02 versions: films whose posters come from the most different regions */
+  const multi = films.map((m) => {
+    const byRegion = {};
+    P[m.id].forEach((p) => { const g = p.g || ''; if (g && !byRegion[g]) byRegion[g] = ALL.find((x) => x.id === p.id && x.m === m); });
+    return { m, list: Object.values(byRegion) };
+  }).filter((x) => x.list.length >= 3).sort((a, b) => b.list.length - a.list.length || (b.m.r || 0) - (a.m.r || 0)).slice(0, 6);
+  if (multi.length) {
+    $('#versions-p').textContent = '同一部电影在不同国家上映时，常常换一张完全不同的脸。这些是你看过的影视里，地区版本最多的几部。';
+    $('#versions-list').innerHTML = multi.map(({ m, list }) => `<div class="pa-ver">
+      <div class="pa-ver-h"><h3>${esc(m.t)}</h3><div class="mono">${[m.y, (m.d || []).slice(0, 2).join(' / ')].filter(Boolean).map(esc).join('　·　')}${m.r ? `　·　<span class="stars">${stars(m.r)}</span>` : ''}</div><div class="pa-ver-n">${list.length}<small>个版本</small></div></div>
+      <div class="pa-ver-row">${list.slice(0, 6).map((p) => `<figure>${imgHTML(p)}<figcaption class="mono">${esc(p.g)}</figcaption></figure>`).join('')}</div></div>`).join('');
+  } else { $('#versions-p').textContent = '海报的地区版本还不够多，暂时没有可以并排比较的影片。'; }
+  $('#regions').innerHTML = `<div class="label">版本地图 — 海报来自哪里</div><div class="pa-reg">${regions.slice(0, 16).map(([g, n]) => `<button class="chip" data-region="${esc(g)}">${esc(g)}<b>${n}</b></button>`).join('')}</div>`;
+  $('#regions').addEventListener('click', (e) => { const c = e.target.closest('[data-region]'); if (c) { state.region = c.dataset.region; $('#f-region').value = state.region; state.year = ''; render(true); $('#wall').scrollIntoView(); } });
+
+  /* 03 the wall */
+  const state = { year: '', kind: '', region: '', view: 'film', shown: 0 };
+  const PAGE_FILMS = 18, PAGE_TILES = 90;
+  $('#f-region').innerHTML = '<option value="">全部地区版本</option>' + regions.map(([g, n]) => `<option value="${esc(g)}">${esc(g)}版　${n}</option>`).join('');
+  const kinds = [['', '全部'], ['five', '五星'], ['正式海报', '正式海报'], ['预告海报', '预告海报'], ['其他海报', '其他海报']];
+  const chips = () => {
+    $('#chips-year').innerHTML = [['', '全部年份'], ...years.map((y) => [y, y])].map(([v, l]) => `<button class="chip" data-year="${v}" aria-pressed="${state.year === v}">${l}</button>`).join('');
+    $('#chips-kind').innerHTML = kinds.map(([v, l]) => `<button class="chip" data-kind="${v}" aria-pressed="${state.kind === v}">${l}</button>`).join('');
+  };
+  const match = (p) => (!state.year || p.m.date.startsWith(state.year)) && (!state.region || p.g === state.region)
+    && (!state.kind || (state.kind === 'five' ? p.m.r === 5 : p.k === state.kind));
+  function render(reset) {
+    if (reset) state.shown = 0;
+    chips();
+    const list = ALL.filter(match);
+    const nFilms = new Set(list.map((p) => p.m.id)).size;
+    $('#wall-p').textContent = `${nFilms} 部影视 · ${list.length} 张海报`;
+    let html = '', more = false;
+    if (state.view === 'tile') {
+      state.shown += PAGE_TILES;
+      html = `<div class="pa-tiles">${list.slice(0, state.shown).map((p) => imgHTML(p)).join('')}</div>`;
+      more = list.length > state.shown;
+    } else {
+      const fl = films.filter((m) => list.some((p) => p.m === m));
+      state.shown += PAGE_FILMS;
+      html = fl.slice(0, state.shown).map((m) => {
+        const ps = list.filter((p) => p.m === m);
+        return `<div class="pa-film"><div class="pa-film-h" data-film="${esc(m.id)}"><span class="mono">${esc(m.date.replace(/-/g, '.'))}</span><h3>${esc(m.t)}</h3><div class="mono">${[m.y, (m.c || [])[0]].filter(Boolean).map(esc).join(' · ')}${m.r ? ` <span class="stars">${stars(m.r)}</span>` : ''}</div></div>
+          <div class="pa-film-row">${ps.map((p) => `<figure>${imgHTML(p)}<figcaption class="mono">${esc(capText(p))}</figcaption></figure>`).join('')}</div></div>`;
+      }).join('');
+      more = fl.length > state.shown;
+    }
+    $('#wall-body').innerHTML = html || '<p class="label" style="padding:40px 0">没有符合条件的海报。</p>';
+    $('#more').hidden = !more;
+  }
+  document.querySelector('.pa-controls').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    if ('year' in c.dataset) state.year = c.dataset.year;
+    if ('kind' in c.dataset) state.kind = c.dataset.kind;
+    render(true);
+  });
+  $('#f-region').addEventListener('change', (e) => { state.region = e.target.value; render(true); });
+  $('#f-view').addEventListener('change', (e) => { state.view = e.target.value; render(true); });
+  $('#more').addEventListener('click', () => render(false));
+  render(true);
+
+  /* lightbox: steps through whatever group the clicked poster belongs to */
+  const box = $('#box');
+  let group = [], at = 0;
+  const show = () => {
+    const p = group[at];
+    $('#box-img').src = p.f; $('#box-img').alt = `《${p.m.t}》${capText(p)}`;
+    $('#box-cap').innerHTML = `<div><b>${esc(p.m.t)}</b>${p.m.o ? `<span class="o">${esc(p.m.o)}</span>` : ''}</div>
+      <div class="mono">${esc(capText(p))}${p.w ? `　·　原图 ${p.w} × ${p.h}` : ''}${p.c ? `　·　${p.c} 条回应` : ''}${p.m.r ? `　·　<span class="stars">${stars(p.m.r)}</span>` : ''}</div>
+      <div class="mono"><a href="https://movie.douban.com/photos/photo/${esc(p.id)}/" target="_blank" rel="noopener">在豆瓣看原图 ↗</a>　<span class="dim">${at + 1} / ${group.length}</span></div>`;
+  };
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.pa-p'); if (!b) return;
+    const p = ALL.find((x) => x.id === b.dataset.pid); if (!p) return;
+    // step through exactly what is on screen around the clicked poster, in screen order
+    const scope = b.closest('.pa-ver-row') || b.closest('section') || document;
+    group = [...scope.querySelectorAll('.pa-p')].map((x) => ALL.find((y) => y.id === x.dataset.pid)).filter(Boolean);
+    at = Math.max(0, [...scope.querySelectorAll('.pa-p')].indexOf(b));
+    show(); box.showModal();
+  });
+  box.addEventListener('click', (e) => {
+    if (e.target === box || e.target.closest('[data-x]')) return box.close();
+    const s = e.target.closest('[data-step]'); if (s) { at = (at + +s.dataset.step + group.length) % group.length; show(); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!box.open) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { at = (at + (e.key === 'ArrowRight' ? 1 : -1) + group.length) % group.length; show(); }
+  });
+}
+</script>
+</body>
+</html>
