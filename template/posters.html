@@ -180,7 +180,7 @@ if (!ALL.length) {
     const p = group[at];
     $('#box-img').src = p.f; $('#box-img').alt = `《${p.m.t}》${capText(p)}`;
     $('#box-cap').innerHTML = `<div><b>${esc(p.m.t)}</b>${p.m.o ? `<span class="o">${esc(p.m.o)}</span>` : ''}</div>
-      <div class="mono">${esc(capText(p))}${p.w ? `　·　原图 ${p.w} × ${p.h}` : ''}${p.c ? `　·　${p.c} 条回应` : ''}${p.m.r ? `　·　<span class="stars">${stars(p.m.r)}</span>` : ''}</div>
+      <div class="mono">${esc(capText(p))}${p.ow ? `　·　原图 ${p.ow} × ${p.oh}` : ''}${p.c ? `　·　${p.c} 条回应` : ''}${p.m.r ? `　·　<span class="stars">${stars(p.m.r)}</span>` : ''}</div>
       <div class="mono"><a href="https://movie.douban.com/photos/photo/${esc(p.id)}/" target="_blank" rel="noopener">在豆瓣看原图 ↗</a>　<span class="dim">${at + 1} / ${group.length}</span></div>`;
   };
   document.addEventListener('click', (e) => {

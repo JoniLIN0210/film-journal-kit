@@ -259,7 +259,8 @@
         const [k, ...g] = label.split(' ');
         const dim = (txt(li.querySelector('.prop')).match(/(\d+)\s*x\s*(\d+)/) || []).slice(1).map(Number);
         const c = parseInt((txt(nameEl && nameEl.querySelector('a')).match(/\d+/) || ['0'])[0], 10) || 0;
-        return { id: li.dataset.id, src: img && img.src, k: k || '', g: g.join(' '), w: dim[0] || 0, h: dim[1] || 0, c };
+        const region = g.join(' ').replace(/^(台湾|香港|澳门)$/, '中国$1').replace(/^大陆$/, '中国大陆');
+        return { id: li.dataset.id, src: img && img.src, k: k || '', g: region, ow: dim[0] || 0, oh: dim[1] || 0, c };
       }).filter((p) => p.id && p.src);
       // shrink to ~420px wide JPEG: keeps the zip small (a full set is a few hundred posters)
       const shrink = async (blob) => {
@@ -269,8 +270,8 @@
           const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
           cv.getContext('2d').drawImage(bmp, 0, 0, W, H);
           if (bmp.close) bmp.close();
-          return (await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8))) || blob;
-        } catch { return blob; }
+          return { blob: (await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8))) || blob, w: W, h: H };
+        } catch { return { blob, w: 0, h: 0 }; }
       };
       let gdone = 0, gstop = false;
       cursor = 0;
@@ -285,13 +286,14 @@
               try {
                 const r = await fetch(p.src, { mode: 'cors', credentials: 'omit' });
                 if (!r.ok) return;
-                const b = await shrink(await r.blob());
+                const { blob: b, w, h } = await shrink(await r.blob());
                 if (b.size < 1500) return;
+                p.w = w; p.h = h;
                 p.f = `posters/p${p.id}.jpg`;
                 galleryFiles[p.f] = new Uint8Array(await b.arrayBuffer());
               } catch { /* skip this one */ }
             }));
-            const kept = ps.filter((p) => p.f).map(({ id, k, g, w, h, c, f: file }) => ({ id, k, g, w, h, c, f: file }));
+            const kept = ps.filter((p) => p.f).map(({ id, k, g, w, h, ow, oh, c, f: file }) => ({ id, k, g, w, h, ...(ow ? { ow, oh } : {}), c, f: file }));
             if (kept.length) { gallery[f.id] = kept; gcount += kept.length; }
           } catch (e) {
             if (e === SKIP) gstop = true; else if (cancelled) throw e;
