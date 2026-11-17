@@ -13,7 +13,7 @@
     <div class="bar">
       <a class="brand" href="index.html"><span class="me" data-me></span>的观影志<i>Film Journal</i></a>
       <nav class="mono">
-        <a href="#icons">最受关注</a><a href="#versions">各国版本</a><a href="#wall">海报墙</a>
+        <a href="#notes" id="nav-notes">赏析</a><a href="#icons">最受关注</a><a href="#versions">各国版本</a><a href="#alt">另类</a><a href="#wall">海报墙</a>
         <a class="pill" href="index.html">← 主页</a>
         <a class="pill solid" href="report.html"><span data-ry></span> 年度报告</a>
       </nav>
@@ -32,6 +32,13 @@
 </header>
 
 <main>
+  <section class="t-lime" id="notes">
+    <div class="wrap">
+      <div class="head"><div class="idx mono">00 — Appreciation</div><h2>名作赏析<i>posters worth a closer look</i></h2><p id="notes-p"></p></div>
+      <div id="notes-list"></div>
+    </div>
+  </section>
+
   <section class="t-black" id="icons">
     <div class="wrap">
       <div class="head"><div class="idx mono">01 — Icons</div><h2>最受关注<i>the most talked-about</i></h2><p id="icons-p"></p></div>
@@ -47,9 +54,16 @@
     </div>
   </section>
 
+  <section class="t-blue" id="alt">
+    <div class="wrap">
+      <div class="head"><div class="idx mono">03 — Alternative</div><h2>另类与艺术<i>beyond the one-sheet</i></h2><p id="alt-p"></p></div>
+      <div class="pa-tiles" id="alt-grid"></div>
+    </div>
+  </section>
+
   <section class="t-black" id="wall">
     <div class="wrap">
-      <div class="head"><div class="idx mono">03 — The Wall</div><h2>海报墙<i>every poster</i></h2><p id="wall-p"></p></div>
+      <div class="head"><div class="idx mono">04 — The Wall</div><h2>海报墙<i>every poster</i></h2><p id="wall-p"></p></div>
       <div class="controls pa-controls">
         <div class="row" id="chips-year"></div>
         <div class="row">
@@ -74,12 +88,12 @@
   <figure><img id="box-img" alt=""><figcaption id="box-cap"></figcaption></figure>
 </dialog>
 
-<footer class="t-black"><div class="wrap mono"><span>Curated by <a id="me-link" target="_blank" rel="noopener" data-me></a> — The Poster Archive</span><span>海报来自豆瓣，版权归各片方与设计师所有 · 仅供个人收藏</span></div></footer>
+<footer class="t-black"><div class="wrap mono"><span>Curated by <a id="me-link" target="_blank" rel="noopener" data-me></a> — The Poster Archive</span><span id="credits">海报来自豆瓣，版权归各片方与设计师所有 · 仅供个人收藏</span></div></footer>
 
 <script>/* always load the freshest data after an update */ document.write('<script src="data/movies.js?v=' + Date.now() + '"><\/script><script src="data/posters.js?v=' + Date.now() + '"><\/script>');</script>
 <script src="assets/common.js"></script>
 <script>
-const P = window.POSTERS || {};
+const P = window.POSTERS || {}, CUR = window.CURATION || {};
 const byId = Object.fromEntries(M.map((m) => [m.id, m]));
 /* one flat list; each poster knows its film and its rank inside that film (0 = most liked on Douban) */
 const ALL = [];
@@ -91,12 +105,15 @@ document.querySelectorAll('[data-ry]').forEach((el) => { el.textContent = RY; })
 $('#me-link').href = PROFILE.url || '#';
 
 const imgHTML = (p, cls = '') => `<button class="pa-p ${cls}" data-pid="${esc(p.id)}" style="aspect-ratio:${p.w && p.h ? Math.min(0.85, Math.max(0.55, p.w / p.h)).toFixed(3) : '0.68'}"><img loading="lazy" src="${esc(p.f)}" alt="《${esc(p.m.t)}》${esc(p.k || '海报')}"></button>`;
-const capText = (p) => [p.k, p.g].filter(Boolean).join(' · ') || '海报';
+const isAlt = (p) => p.k === '其他海报' || p.lang === '无字版';
+const capText = (p) => (p.s === 't' ? ['TMDB', p.lang, p.v ? `★ ${p.v}` : ''] : [p.k === '其他海报' ? '艺术与同人' : p.k, p.g, p.note]).filter(Boolean).join(' · ') || '海报';
+const srcLink = (p) => p.s === 't' ? `https://www.themoviedb.org/${p.tm}/images/posters` : `https://movie.douban.com/photos/photo/${p.id}/`;
 const regions = (() => { const t = {}; ALL.forEach((p) => { if (p.g) t[p.g] = (t[p.g] || 0) + 1; }); return Object.entries(t).sort((a, b) => b[1] - a[1]); })();
+if (PROFILE.tmdb) $('#credits').innerHTML = '海报来自豆瓣与 TMDB，版权归各片方与设计师所有 · 仅供个人收藏 · This product uses the TMDB API but is not endorsed or certified by TMDB.';
 
 if (!ALL.length) {
   $('#pa-intro').textContent = '这一份观影志还没有收集海报。重新点一次收藏栏里的按钮，选择“观影志 + 海报馆”即可生成。';
-  ['#icons', '#versions', '#wall'].forEach((s) => { $(s).hidden = true; });
+  ['#notes', '#icons', '#versions', '#alt', '#wall'].forEach((s) => { $(s).hidden = true; });
 } else {
   /* hero */
   $('#pa-vol').textContent = `Vol. ${years[years.length - 1]} — ${years[0]}　/　${ME} 的海报收藏`;
@@ -104,6 +121,25 @@ if (!ALL.length) {
   $('#pa-asof').textContent = `Updated ${(PROFILE.updated || '').replace(/-/g, '.')}`;
   const strip = films.slice(0, 16).map((m) => ALL.find((p) => p.m === m)).filter(Boolean);
   $('#pa-strip').innerHTML = [...strip, ...strip].map((p) => `<img src="${esc(p.f)}" alt="">`).join('');
+
+  /* 00 appreciation: curated notes on famous posters among the films this person has seen */
+  const curFilms = films.filter((m) => CUR[m.id] && (CUR[m.id].items || []).length);
+  if (curFilms.length) {
+    $('#notes-p').textContent = `你看过的影视里，有 ${curFilms.length} 部的海报在设计史上留下了名字。`;
+    $('#notes-list').innerHTML = curFilms.map((m, i) => CUR[m.id].items.map((it) => {
+      const p = ALL.find((x) => x.m === m && x.s === 'd' && x.id === it.photo) || ALL.find((x) => x.m === m);
+      return `<article class="pa-note${i % 2 ? ' flip' : ''}">
+        <div class="pa-note-img">${p ? imgHTML(p) : ''}</div>
+        <div class="pa-note-body">
+          <div class="mono">${esc([m.y, it.kind || '', it.region || ''].filter(Boolean).join('　·　'))}</div>
+          <h3>${esc(m.t)}</h3>
+          ${it.headline ? `<p class="lede">${esc(it.headline)}</p>` : ''}
+          ${it.designer ? `<div class="by"><span class="label">Design</span>${esc(it.designer)}</div>` : ''}
+          ${(it.text || '').split('\n').filter(Boolean).map((t) => `<p>${esc(t)}</p>`).join('')}
+          ${(it.sources || []).length ? `<div class="src mono">参考：${it.sources.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>`).join('　')}</div>` : ''}
+        </div></article>`;
+    }).join('')).join('');
+  } else { $('#notes').hidden = true; $('#nav-notes').hidden = true; }
 
   /* 01 icons: most discussed posters overall (Douban reply count), one per film */
   const seen = new Set();
@@ -127,17 +163,25 @@ if (!ALL.length) {
   $('#regions').innerHTML = `<div class="label">版本地图 — 海报来自哪里</div><div class="pa-reg">${regions.slice(0, 16).map(([g, n]) => `<button class="chip" data-region="${esc(g)}">${esc(g)}<b>${n}</b></button>`).join('')}</div>`;
   $('#regions').addEventListener('click', (e) => { const c = e.target.closest('[data-region]'); if (c) { state.region = c.dataset.region; $('#f-region').value = state.region; state.year = ''; render(true); $('#wall').scrollIntoView(); } });
 
-  /* 03 the wall */
+  /* 03 alternative: fan-made / artistic designs and textless versions */
+  const alts = ALL.filter(isAlt);
+  if (alts.length) {
+    $('#alt-p').textContent = `不是每张海报都出自片方：豆瓣用户和设计师的再创作，以及去掉文字后的原画，共 ${alts.length} 张。`;
+    $('#alt-grid').innerHTML = alts.slice(0, 60).map((p) => `<figure class="pa-alt">${imgHTML(p)}<figcaption class="mono">${esc(p.m.t)}　·　${esc(capText(p))}</figcaption></figure>`).join('');
+  } else { $('#alt').hidden = true; }
+
+  /* 04 the wall */
   const state = { year: '', kind: '', region: '', view: 'film', shown: 0 };
   const PAGE_FILMS = 18, PAGE_TILES = 90;
   $('#f-region').innerHTML = '<option value="">全部地区版本</option>' + regions.map(([g, n]) => `<option value="${esc(g)}">${esc(g)}版　${n}</option>`).join('');
-  const kinds = [['', '全部'], ['five', '五星'], ['正式海报', '正式海报'], ['预告海报', '预告海报'], ['其他海报', '其他海报']];
+  const kinds = [['', '全部'], ['five', '五星'], ['正式海报', '正式海报'], ['预告海报', '预告海报'], ['其他海报', '艺术与同人'], ['tmdb', 'TMDB'], ['textless', '无字版']]
+    .filter(([v]) => !v || v === 'five' || ALL.some((p) => (v === 'tmdb' ? p.s === 't' : v === 'textless' ? p.lang === '无字版' : p.k === v)));
   const chips = () => {
     $('#chips-year').innerHTML = [['', '全部年份'], ...years.map((y) => [y, y])].map(([v, l]) => `<button class="chip" data-year="${v}" aria-pressed="${state.year === v}">${l}</button>`).join('');
     $('#chips-kind').innerHTML = kinds.map(([v, l]) => `<button class="chip" data-kind="${v}" aria-pressed="${state.kind === v}">${l}</button>`).join('');
   };
   const match = (p) => (!state.year || p.m.date.startsWith(state.year)) && (!state.region || p.g === state.region)
-    && (!state.kind || (state.kind === 'five' ? p.m.r === 5 : p.k === state.kind));
+    && (!state.kind || (state.kind === 'five' ? p.m.r === 5 : state.kind === 'tmdb' ? p.s === 't' : state.kind === 'textless' ? p.lang === '无字版' : p.k === state.kind));
   function render(reset) {
     if (reset) state.shown = 0;
     chips();
@@ -181,13 +225,13 @@ if (!ALL.length) {
     $('#box-img').src = p.f; $('#box-img').alt = `《${p.m.t}》${capText(p)}`;
     $('#box-cap').innerHTML = `<div><b>${esc(p.m.t)}</b>${p.m.o ? `<span class="o">${esc(p.m.o)}</span>` : ''}</div>
       <div class="mono">${esc(capText(p))}${p.ow ? `　·　原图 ${p.ow} × ${p.oh}` : ''}${p.c ? `　·　${p.c} 条回应` : ''}${p.m.r ? `　·　<span class="stars">${stars(p.m.r)}</span>` : ''}</div>
-      <div class="mono"><a href="https://movie.douban.com/photos/photo/${esc(p.id)}/" target="_blank" rel="noopener">在豆瓣看原图 ↗</a>　<span class="dim">${at + 1} / ${group.length}</span></div>`;
+      <div class="mono"><a href="${esc(srcLink(p))}" target="_blank" rel="noopener">${p.s === 't' ? '在 TMDB 看原图' : '在豆瓣看原图'} ↗</a>　<span class="dim">${at + 1} / ${group.length}</span></div>`;
   };
   document.addEventListener('click', (e) => {
     const b = e.target.closest('.pa-p'); if (!b) return;
     const p = ALL.find((x) => x.id === b.dataset.pid); if (!p) return;
     // step through exactly what is on screen around the clicked poster, in screen order
-    const scope = b.closest('.pa-ver-row') || b.closest('section') || document;
+    const scope = b.closest('.pa-ver-row') || b.closest('.pa-note') || b.closest('section') || document;
     group = [...scope.querySelectorAll('.pa-p')].map((x) => ALL.find((y) => y.id === x.dataset.pid)).filter(Boolean);
     at = Math.max(0, [...scope.querySelectorAll('.pa-p')].indexOf(b));
     show(); box.showModal();

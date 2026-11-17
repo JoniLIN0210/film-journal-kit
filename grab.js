@@ -25,6 +25,10 @@
     .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px;font:12px/1.4 'SF Mono',Menlo,monospace;color:rgba(255,255,255,.5)}
     .steps .on{color:#dfff4f}.steps .ok{color:#fff}
     .row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+    details.adv{flex-basis:100%;margin-top:6px;font-size:13px;color:rgba(255,255,255,.8)}
+    details.adv summary{cursor:pointer;font:12px/1.6 'SF Mono',Menlo,monospace;color:#dfff4f}
+    details.adv p{margin:8px 0;line-height:1.6;font-size:12px;color:rgba(255,255,255,.7)}
+    details.adv input{width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid rgba(255,255,255,.6);background:transparent;color:#fff;font:13px 'SF Mono',Menlo,monospace}
     .row button small{display:block;font:400 11px/1.2 'SF Mono',Menlo,monospace;margin-top:6px;opacity:.75;letter-spacing:.04em}
     button,a.b{font:600 14px/1 'Helvetica Neue','PingFang SC',sans-serif;padding:13px 20px;border:1.5px solid #fff;background:none;color:#fff;cursor:pointer;text-decoration:none}
     .solid{background:#dfff4f;border-color:#dfff4f;color:#0b0b0c}
@@ -99,12 +103,18 @@
       return;
     }
 
+    /* ---------------------------------------------------------------- optional kit config (e.g. a licensed TMDB key set by the seller) */
+    let CONFIG = {};
+    try { const r = await fetch(BASE + 'config.json', { cache: 'no-store' }); if (r.ok) CONFIG = await r.json(); } catch { /* none */ }
+    let TMDB = (CONFIG.tmdbKey || '').trim();
+
     /* ---------------------------------------------------------------- choose: journal only, or journal + poster archive */
     const withPosters = await new Promise((resolve) => {
       $('h1').textContent = '生成你的观影志';
-      say('选一种。两种都会读取你的“看过”列表和每部影片的详情；海报馆会再为每部影片收集豆瓣上最受欢迎的几张海报（不同国家、不同版本）。');
-      $('.row').innerHTML = '<button class="solid m1">观影志 + 海报馆<small>用时约多一倍</small></button><button class="m0">只要观影志<small>300 部约 7 分钟</small></button><button class="x">取消</button>';
-      $('.m1').onclick = () => resolve(true);
+      say('选一种。两种都会读取你的“看过”列表和每部影片的详情；海报馆会再为每部影片收集各个国家、各个版本的海报，并附上经典海报的赏析。');
+      $('.row').innerHTML = '<button class="solid m1">观影志 + 海报馆<small>用时约多一倍</small></button><button class="m0">只要观影志<small>300 部约 7 分钟</small></button><button class="x">取消</button>'
+        + '<details class="adv"><summary>高级：加入 TMDB 海报（可选）</summary><p>TMDB 是全球最大的电影资料库，能多收集各语言版本和无字版海报。填入你自己在 themoviedb.org 免费申请的 API 密钥即可；不填就只用豆瓣。密钥只在这次生成中使用，不会保存或上传。</p><input class="tmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB API Key 或 Read Access Token"></details>';
+      $('.m1').onclick = () => { TMDB = ($('.tmdb').value || '').trim() || TMDB; resolve(true); };
       $('.m0').onclick = () => resolve(false);
       $('.x').onclick = () => { cancelled = true; close(); resolve(false); };
     });
@@ -195,6 +205,7 @@
         languages: splitList(infoField(info, '语言')),
         directors: [...doc.querySelectorAll('a[rel="v:directedBy"]')].map(txt).slice(0, 4),
         actors: [...doc.querySelectorAll('a[rel="v:starring"]')].map(txt).slice(0, 6),
+        imdb: (info.match(/IMDb\s*[:：]\s*(tt\d+)/) || [])[1] || '',
       };
     };
     let done = 0, blocked = false;
@@ -246,60 +257,125 @@
       }
     }));
 
-    /* ---------------------------------------------------------------- 4. poster archive: the most-liked posters of each film */
-    const PER_FILM = 5, gallery = {}, galleryFiles = {};
-    let gcount = 0;
+    /* ---------------------------------------------------------------- 4. poster archive
+     * Per film, in this order (near-duplicates dropped by an image fingerprint):
+     *   Douban "海报" page, most liked first (official / teaser, labelled by country)  — up to 6
+     *   TMDB posters, most voted first (labelled by language; "无字版" = textless)      — up to 6, only with a key
+     *   Douban "其他海报" (fan-made and artistic designs), for films rated 4★ and above  — up to 3
+     * Plus curated notes on famous posters (curation.json on the kit site), for films the user has seen. */
+    const gallery = {}, galleryFiles = {}, curation = {};
+    let gcount = 0, tmdbUsed = false, tmdbNote = '';
     if (withPosters) {
       step(3);
-      // Douban's per-film poster page, default order = most liked. Each item: "正式海报 美国", "2000x2963", "114回应".
       const parsePhotos = (doc) => [...doc.querySelectorAll('ul.poster-col3 > li[data-id]')].map((li) => {
         const img = li.querySelector('.cover img');
         const nameEl = li.querySelector('.name');
         const label = nameEl ? [...nameEl.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ').replace(/\s+/g, ' ').trim() : '';
-        const [k, ...g] = label.split(' ');
+        const [k, ...rest] = label.split(' ');
+        let g = rest.join(' ').replace(/^(台湾|香港|澳门)$/, '中国$1').replace(/^大陆$/, '中国大陆');
+        const note = g && !isCountry(g) ? g : '';
+        if (note) g = '';
         const dim = (txt(li.querySelector('.prop')).match(/(\d+)\s*x\s*(\d+)/) || []).slice(1).map(Number);
         const c = parseInt((txt(nameEl && nameEl.querySelector('a')).match(/\d+/) || ['0'])[0], 10) || 0;
-        const region = g.join(' ').replace(/^(台湾|香港|澳门)$/, '中国$1').replace(/^大陆$/, '中国大陆');
-        return { id: li.dataset.id, src: img && img.src, k: k || '', g: region, ow: dim[0] || 0, oh: dim[1] || 0, c };
+        return { id: li.dataset.id, s: 'd', src: img && img.src, k: k || '海报', g, note, ow: dim[0] || 0, oh: dim[1] || 0, c };
       }).filter((p) => p.id && p.src);
-      // shrink to ~420px wide JPEG: keeps the zip small (a full set is a few hundred posters)
+      // shrink to ~420px wide JPEG (keeps the zip small) and take an 8×8 average-hash fingerprint for de-duplication
       const shrink = async (blob) => {
-        try {
-          const bmp = await createImageBitmap(blob);
-          const W = Math.min(420, bmp.width), H = Math.round(bmp.height * W / bmp.width);
-          const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-          cv.getContext('2d').drawImage(bmp, 0, 0, W, H);
-          if (bmp.close) bmp.close();
-          return { blob: (await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8))) || blob, w: W, h: H };
-        } catch { return { blob, w: 0, h: 0 }; }
+        const bmp = await createImageBitmap(blob);
+        const W = Math.min(420, bmp.width), H = Math.round(bmp.height * W / bmp.width);
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+        const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0, W, H);
+        const t = document.createElement('canvas'); t.width = t.height = 8;
+        const tx = t.getContext('2d'); tx.drawImage(bmp, 0, 0, 8, 8);
+        const px = tx.getImageData(0, 0, 8, 8).data, gray = [];
+        for (let i = 0; i < 64; i++) gray.push(px[i * 4] * 0.3 + px[i * 4 + 1] * 0.59 + px[i * 4 + 2] * 0.11);
+        const avg = gray.reduce((x, y) => x + y, 0) / 64;
+        if (bmp.close) bmp.close();
+        return { blob: await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8)), w: W, h: H, hash: gray.map((v) => (v > avg ? 1 : 0)) };
       };
+      const same = (a, b) => { let d = 0; for (let i = 0; i < 64; i++) d += a[i] !== b[i]; return d <= 6; };
+      const grab = async (p, kept) => {
+        try {
+          const r = await fetch(p.src, { mode: 'cors', credentials: 'omit' });
+          if (!r.ok) return;
+          const { blob, w, h, hash } = await shrink(await r.blob());
+          if (!blob || blob.size < 1500 || kept.some((q) => same(q.hash, hash))) return;
+          p.w = w; p.h = h; p.hash = hash; p.f = `posters/${p.s}${p.id}.jpg`;
+          galleryFiles[p.f] = new Uint8Array(await blob.arrayBuffer());
+          kept.push(p);
+        } catch { /* skip this one */ }
+      };
+
+      // TMDB (optional): check the key once, so a bad key or blocked network costs nothing later
+      const tm = async (path) => {
+        const bearer = TMDB.length > 60;
+        const url = 'https://api.themoviedb.org/3' + path + (bearer ? '' : (path.includes('?') ? '&' : '?') + 'api_key=' + encodeURIComponent(TMDB));
+        const r = await fetch(url, { credentials: 'omit', headers: bearer ? { Authorization: 'Bearer ' + TMDB } : {} });
+        if (r.status === 401) throw new Error('TMDB_KEY');
+        return r.ok ? r.json() : null;
+      };
+      if (TMDB) {
+        say('正在连接 TMDB…');
+        try {
+          await Promise.race([tm('/configuration'), new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 10000))]);
+          tmdbUsed = true;
+        } catch (e) { tmdbNote = e.message === 'TMDB_KEY' ? 'TMDB 密钥无效，这次只用了豆瓣的海报。' : '连不上 TMDB（可能是网络原因），这次只用了豆瓣的海报。'; }
+      }
+      const LANG = { en: '英文版', zh: '中文版', ja: '日文版', ko: '韩文版', fr: '法文版', de: '德文版', es: '西班牙文版', it: '意大利文版', ru: '俄文版', pt: '葡萄牙文版', pl: '波兰文版', cs: '捷克文版', sv: '瑞典文版', da: '丹麦文版', nl: '荷兰文版', tr: '土耳其文版', th: '泰文版', hu: '匈牙利文版' };
+      const tmdbPosters = async (f) => {
+        const imdb = f.detail && f.detail.imdb;
+        if (!tmdbUsed || !imdb) return [];
+        try {
+          const found = await tm(`/find/${imdb}?external_source=imdb_id`);
+          const hit = found && ((found.movie_results || [])[0] ? ['movie', found.movie_results[0]] : (found.tv_results || [])[0] ? ['tv', found.tv_results[0]] : null);
+          if (!hit) return [];
+          const imgs = await tm(`/${hit[0]}/${hit[1].id}/images`);
+          return ((imgs && imgs.posters) || []).sort((a, b) => (b.vote_count - a.vote_count) || (b.vote_average - a.vote_average)).slice(0, 8).map((x) => ({
+            id: x.file_path.replace(/^\/|\.\w+$/g, ''), s: 't', src: 'https://image.tmdb.org/t/p/w342' + x.file_path,
+            k: 'TMDB', lang: x.iso_639_1 ? (LANG[x.iso_639_1] || x.iso_639_1.toUpperCase() + ' 版') : '无字版',
+            v: x.vote_count ? +x.vote_average.toFixed(1) : 0, ow: x.width, oh: x.height, tm: `${hit[0]}/${hit[1].id}`,
+          }));
+        } catch (e) { if (e.message === 'TMDB_KEY') tmdbUsed = false; return []; }
+      };
+
+      // curated notes (kit site); keep only films this user has seen, and make sure their posters are in the zip
+      let CUR = {};
+      try { const r = await fetch(BASE + 'curation.json', { cache: 'no-store' }); if (r.ok) CUR = await r.json(); } catch { /* none */ }
+
       let gdone = 0, gstop = false;
       cursor = 0;
       await Promise.all([0, 1].map(async () => {
         while (cursor < list.length && !gstop) {
           check();
           const f = list[cursor++];
+          const kept = [];
           try {
             const { doc } = await fetchDoc(`/subject/${f.id}/photos?type=R&start=0&sortby=like&size=a&subtype=a`);
-            const ps = parsePhotos(doc).slice(0, PER_FILM);
-            await Promise.all(ps.map(async (p) => {
-              try {
-                const r = await fetch(p.src, { mode: 'cors', credentials: 'omit' });
-                if (!r.ok) return;
-                const { blob: b, w, h } = await shrink(await r.blob());
-                if (b.size < 1500) return;
-                p.w = w; p.h = h;
-                p.f = `posters/p${p.id}.jpg`;
-                galleryFiles[p.f] = new Uint8Array(await b.arrayBuffer());
-              } catch { /* skip this one */ }
-            }));
-            const kept = ps.filter((p) => p.f).map(({ id, k, g, w, h, ow, oh, c, f: file }) => ({ id, k, g, w, h, ...(ow ? { ow, oh } : {}), c, f: file }));
-            if (kept.length) { gallery[f.id] = kept; gcount += kept.length; }
+            const main = parsePhotos(doc).filter((p) => p.k !== '其他海报').slice(0, 6);
+            for (const p of main) await grab(p, kept);
+            for (const p of (await tmdbPosters(f)).slice(0, 8)) { if (kept.filter((q) => q.s === 't').length >= 6) break; await grab(p, kept); }
+            if (f.rating >= 4) {
+              await sleep(300);
+              const { doc: od } = await fetchDoc(`/subject/${f.id}/photos?type=R&start=0&sortby=like&size=a&subtype=t`);
+              for (const p of parsePhotos(od).slice(0, 4)) { if (kept.filter((q) => q.k === '其他海报').length >= 3) break; await grab(p, kept); }
+            }
+            const cur = CUR[f.id];
+            if (cur && cur.items) {
+              curation[f.id] = cur;
+              for (const it of cur.items) {
+                if (!it.photo || kept.some((q) => q.s === 'd' && q.id === it.photo)) continue;
+                const p = { id: it.photo, s: 'd', src: `https://img1.doubanio.com/view/photo/m/public/p${it.photo}.jpg`, k: it.kind || '正式海报', g: it.region || '', c: 0 };
+                await grab(p, []);  // always keep the curated one, even if it looks like another
+                if (p.f) kept.push(p);
+              }
+            }
           } catch (e) {
             if (e === SKIP) gstop = true; else if (cancelled) throw e;
           }
+          const out = kept.map(({ id, s: src, k, g, note, lang, v, w, h, ow, oh, c, f: file, tm: t }) => Object.fromEntries(Object.entries({ id, s: src, k, g, note, lang, v, w, h, ow, oh, c, f: file, tm: t }).filter(([, x]) => x !== undefined && x !== '' && x !== 0)));
+          if (out.length) { gallery[f.id] = out; gcount += out.length; }
           gdone++;
-          say(`正在收集海报馆：${gdone} / ${list.length} 部，已收集 ${gcount} 张`);
+          say(`正在收集海报馆：${gdone} / ${list.length} 部，已收集 ${gcount} 张` + (tmdbUsed ? '（豆瓣 + TMDB）' : ''));
           bar(span(R.g, gdone / list.length));
           await sleep(350);
         }
@@ -321,7 +397,7 @@
       };
     }).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
     const now = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
-    const profile = { id: uid, name, updated: now, url: `https://www.douban.com/people/${uid}/`, posters: gcount };
+    const profile = { id: uid, name, updated: now, url: `https://www.douban.com/people/${uid}/`, posters: gcount, tmdb: tmdbUsed };
     const dataJs = `window.PROFILE = ${JSON.stringify(profile)};\nwindow.MOVIES = ${JSON.stringify(rows)};\n`;
 
     if (window.__FJ_SINK) { await window.__FJ_SINK({ profile, rows, dataJs, gallery, galleryFiles, detailed: list.filter((f) => f.detail).length, blocked }); finish('测试完成', `共 ${rows.length} 部`); return; }
@@ -333,7 +409,7 @@
       files[p] = await r.text();
     }
     files['data/movies.js'] = dataJs;
-    files['data/posters.js'] = `window.POSTERS = ${JSON.stringify(gallery)};\n`;
+    files['data/posters.js'] = `window.POSTERS = ${JSON.stringify(gallery)};\nwindow.CURATION = ${JSON.stringify(curation)};\n`;
     Object.assign(files, galleryFiles);
     files['README.txt'] = '\ufeff' + [
       `${name} 的观影志 · 生成于 ${now}`, '',
@@ -352,7 +428,7 @@
     const detailed = list.filter((f) => f.detail).length;
     finish('完成了 🎬',
       `共 ${rows.length} 部影视${gcount ? `，海报馆收集了 ${gcount} 张海报` : ''}，已下载「${filename}」（${(zip.size / 1048576).toFixed(1)} MB）。解压后双击里面的 index.html 就能打开你的观影志。` +
-      (blocked ? ` 有 ${list.length - detailed} 部的详情这次没读到（豆瓣暂时拦截了），用了列表页的简要信息；过一段时间再点一次按钮会更完整。`
+      (tmdbNote ? ' ' + tmdbNote : '') + (blocked ? ` 有 ${list.length - detailed} 部的详情这次没读到（豆瓣暂时拦截了），用了列表页的简要信息；过一段时间再点一次按钮会更完整。`
         : detailed < list.length ? ` 有 ${list.length - detailed} 部的详情页打不开（通常是豆瓣已下架的条目），用了列表页的简要信息。` : ''),
       `<a class="b solid" href="${url}" download="${filename}">没有自动下载？点这里</a><button class="ok-btn">关闭</button>`);
   } catch (err) {
@@ -361,13 +437,18 @@
   }
 
   /* ---------------------------------------------------------------- helpers */
-  function parseIntro(f) {
-    const COUNTRIES = new Set(`中国大陆 中国香港 中国台湾 中国澳门 中国 美国 日本 韩国 英国 法国 德国 意大利 西班牙 印度 泰国 俄罗斯 苏联 加拿大 澳大利亚
+  function countrySet() {
+    return new Set(`中国大陆 中国香港 中国台湾 中国澳门 中国 美国 日本 韩国 英国 法国 德国 意大利 西班牙 印度 泰国 俄罗斯 苏联 加拿大 澳大利亚
       爱尔兰 瑞典 巴西 丹麦 新加坡 墨西哥 阿根廷 比利时 荷兰 瑞士 奥地利 波兰 伊朗 土耳其 新西兰 挪威 芬兰 匈牙利 捷克 希腊 葡萄牙 以色列 黎巴嫩
       冰岛 智利 哥伦比亚 南非 越南 菲律宾 马来西亚 印度尼西亚 卡塔尔 罗马尼亚 保加利亚 塞尔维亚 乌克兰 格鲁吉亚 西德 东德 捷克斯洛伐克 南斯拉夫
       卢森堡 埃及 摩洛哥 突尼斯 沙特阿拉伯 阿联酋 约旦 巴勒斯坦 不丹 尼泊尔 蒙古 哈萨克斯坦 古巴 秘鲁 乌拉圭 爱沙尼亚 拉脱维亚 立陶宛 克罗地亚
       斯洛文尼亚 斯洛伐克 波黑 北马其顿 马其顿 阿尔巴尼亚 塞浦路斯 马耳他 摩纳哥 柬埔寨 老挝 缅甸 孟加拉国 巴基斯坦 斯里兰卡 阿富汗 伊拉克 叙利亚
       肯尼亚 尼日利亚 塞内加尔 乍得 毛里塔尼亚 阿尔及利亚 委内瑞拉 玻利维亚 巴拉圭 厄瓜多尔 多米尼加 波多黎各 朝鲜 列支敦士登 科索沃 黑山`.split(/\s+/));
+  }
+  function isCountry(x) { return countrySet().has(String(x).split(' ')[0]); }
+
+  function parseIntro(f) {
+    const COUNTRIES = countrySet();
     const GENRES = new Set('剧情 喜剧 动作 爱情 科幻 动画 悬疑 惊悚 恐怖 纪录片 短片 情色 同性 音乐 歌舞 家庭 儿童 传记 历史 战争 犯罪 西部 奇幻 冒险 灾难 武侠 古装 运动 黑色电影 真人秀 脱口秀 戏曲 荒诞 鬼怪'.split(' '));
     const series = /第.{1,3}季|Season \d/.test(f.title + ' ' + (f.orig || ''));
     const segs = (f.intro || '').split(' / ').map((x) => x.trim().replace(/\/$/, '').trim()).filter(Boolean);
