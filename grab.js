@@ -277,7 +277,9 @@
         if (note) g = '';
         const dim = (txt(li.querySelector('.prop')).match(/(\d+)\s*x\s*(\d+)/) || []).slice(1).map(Number);
         const c = parseInt((txt(nameEl && nameEl.querySelector('a')).match(/\d+/) || ['0'])[0], 10) || 0;
-        return { id: li.dataset.id, s: 'd', src: img && img.src, k: k || '海报', g, note, ow: dim[0] || 0, oh: dim[1] || 0, c };
+        // only the *_ratio_poster sizes on Douban's image server allow cross-origin reads; m_ratio_poster is 540px wide
+        const src = img && img.src.replace(/\/view\/photo\/[a-z_]+\//, '/view/photo/m_ratio_poster/').replace(/\.webp$/, '.jpg');
+        return { id: li.dataset.id, s: 'd', src, k: k || '海报', g, note, ow: dim[0] || 0, oh: dim[1] || 0, c };
       }).filter((p) => p.id && p.src);
       // shrink to ~420px wide JPEG (keeps the zip small) and take an 8×8 average-hash fingerprint for de-duplication
       const shrink = async (blob) => {
@@ -364,7 +366,7 @@
               curation[f.id] = cur;
               for (const it of cur.items) {
                 if (!it.photo || kept.some((q) => q.s === 'd' && q.id === it.photo)) continue;
-                const p = { id: it.photo, s: 'd', src: `https://img1.doubanio.com/view/photo/m/public/p${it.photo}.jpg`, k: it.kind || '正式海报', g: it.region || '', c: 0 };
+                const p = { id: it.photo, s: 'd', src: `https://img1.doubanio.com/view/photo/m_ratio_poster/public/p${it.photo}.jpg`, k: it.kind || '正式海报', g: it.region || '', c: 0 };
                 await grab(p, []);  // always keep the curated one, even if it looks like another
                 if (p.f) kept.push(p);
               }
