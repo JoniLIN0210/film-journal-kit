@@ -82,8 +82,19 @@
     const fetchDoc = async (url) => {
       while (true) {
         check();
-        const res = await fetch(url, { credentials: 'include' });
-        const html = await res.text();
+        let res, html;
+        try {
+          res = await fetch(url, { credentials: 'include' });
+          html = await res.text();
+        } catch (e) {
+          // Douban's human check usually lives on another domain, so the redirect to it surfaces as a network error.
+          // Tell that apart from a real network problem by looking at the redirect without following it.
+          let toCheck = false;
+          try { toCheck = (await fetch(url, { credentials: 'include', redirect: 'manual' })).type === 'opaqueredirect'; } catch { /* offline */ }
+          if (!toCheck) throw e;
+          if ((await verify()) === 'skip') throw SKIP;
+          continue;
+        }
         if (!blockedRes(res, html)) return { res, doc: new DOMParser().parseFromString(html, 'text/html'), html };
         if ((await verify()) === 'skip') throw SKIP;
       }
@@ -180,7 +191,7 @@
 
     /* ---------------------------------------------------------------- 2. details from each film page */
     step(1);
-    const list = [...films.values()];
+    const list = [...films.values()].slice(0, window.__FJ_LIMIT || Infinity);  // __FJ_LIMIT: testing only
     const infoField = (info, label) => {
       const m = info.match(new RegExp(label + '\\s*[:：]\\s*([^\\n]+)'));
       return m ? m[1].trim() : '';
@@ -296,16 +307,22 @@
         return { blob: await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8)), w: W, h: H, hash: gray.map((v) => (v > avg ? 1 : 0)) };
       };
       const same = (a, b) => { let d = 0; for (let i = 0; i < 64; i++) d += a[i] !== b[i]; return d <= 6; };
-      const grab = async (p, kept) => {
+      // download + shrink in parallel; keeping (with de-duplication) happens afterwards, in priority order
+      const prep = (list) => Promise.all(list.map(async (p) => {
         try {
           const r = await fetch(p.src, { mode: 'cors', credentials: 'omit' });
-          if (!r.ok) return;
+          if (!r.ok) return null;
           const { blob, w, h, hash } = await shrink(await r.blob());
-          if (!blob || blob.size < 1500 || kept.some((q) => same(q.hash, hash))) return;
-          p.w = w; p.h = h; p.hash = hash; p.f = `posters/${p.s}${p.id}.jpg`;
-          galleryFiles[p.f] = new Uint8Array(await blob.arrayBuffer());
-          kept.push(p);
-        } catch { /* skip this one */ }
+          return blob && blob.size >= 1500 ? Object.assign(p, { blob, w, h, hash }) : null;
+        } catch { return null; }
+      })).then((x) => x.filter(Boolean));
+      const keep = async (p, kept, force) => {
+        if (!force && kept.some((q) => same(q.hash, p.hash))) return false;
+        p.f = `posters/${p.s}${p.id}.jpg`;
+        galleryFiles[p.f] = new Uint8Array(await p.blob.arrayBuffer());
+        delete p.blob;
+        kept.push(p);
+        return true;
       };
 
       // TMDB (optional): check the key once, so a bad key or blocked network costs nothing later
@@ -354,21 +371,20 @@
           try {
             const { doc } = await fetchDoc(`/subject/${f.id}/photos?type=R&start=0&sortby=like&size=a&subtype=a`);
             const main = parsePhotos(doc).filter((p) => p.k !== '其他海报').slice(0, 6);
-            for (const p of main) await grab(p, kept);
-            for (const p of (await tmdbPosters(f)).slice(0, 8)) { if (kept.filter((q) => q.s === 't').length >= 6) break; await grab(p, kept); }
-            if (f.rating >= 4) {
-              await sleep(300);
-              const { doc: od } = await fetchDoc(`/subject/${f.id}/photos?type=R&start=0&sortby=like&size=a&subtype=t`);
-              for (const p of parsePhotos(od).slice(0, 4)) { if (kept.filter((q) => q.k === '其他海报').length >= 3) break; await grab(p, kept); }
-            }
+            const others = f.rating >= 4
+              ? sleep(300).then(() => fetchDoc(`/subject/${f.id}/photos?type=R&start=0&sortby=like&size=a&subtype=t`)).then(({ doc: od }) => prep(parsePhotos(od).slice(0, 4)))
+              : Promise.resolve([]);
+            const [a, t, o] = await Promise.all([prep(main), tmdbPosters(f).then(prep), others]);
+            for (const p of a) await keep(p, kept);
+            let nt = 0; for (const p of t) { if (nt >= 6) break; if (await keep(p, kept)) nt++; }
+            let no = 0; for (const p of o) { if (no >= 3) break; if (await keep(p, kept)) no++; }
             const cur = CUR[f.id];
             if (cur && cur.items) {
               curation[f.id] = cur;
               for (const it of cur.items) {
                 if (!it.photo || kept.some((q) => q.s === 'd' && q.id === it.photo)) continue;
-                const p = { id: it.photo, s: 'd', src: `https://img1.doubanio.com/view/photo/m_ratio_poster/public/p${it.photo}.jpg`, k: it.kind || '正式海报', g: it.region || '', c: 0 };
-                await grab(p, []);  // always keep the curated one, even if it looks like another
-                if (p.f) kept.push(p);
+                const [p] = await prep([{ id: it.photo, s: 'd', src: `https://img1.doubanio.com/view/photo/m_ratio_poster/public/p${it.photo}.jpg`, k: it.kind || '正式海报', g: it.region || '', c: 0 }]);
+                if (p) await keep(p, kept, true);  // always keep the curated one, even if it looks like another
               }
             }
           } catch (e) {
