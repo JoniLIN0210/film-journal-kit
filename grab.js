@@ -271,7 +271,8 @@
     const detailed = list.filter((f) => f.detail).length;
     finish('完成了 🎬',
       `共 ${rows.length} 部影视，已下载「${filename}」（${(zip.size / 1048576).toFixed(1)} MB）。解压后双击里面的 index.html 就能打开你的观影志。` +
-      (blocked || detailed < list.length ? ` 有 ${list.length - detailed} 部的详情这次没读到（豆瓣暂时拦截了），用了列表页的简要信息；过一段时间再点一次按钮会更完整。` : ''),
+      (blocked ? ` 有 ${list.length - detailed} 部的详情这次没读到（豆瓣暂时拦截了），用了列表页的简要信息；过一段时间再点一次按钮会更完整。`
+        : detailed < list.length ? ` 有 ${list.length - detailed} 部的详情页打不开（通常是豆瓣已下架的条目），用了列表页的简要信息。` : ''),
       `<a class="b solid" href="${url}" download="${filename}">没有自动下载？点这里</a><button class="ok-btn">关闭</button>`);
   } catch (err) {
     if (err && err.message === 'skip') { fail('豆瓣需要先完成真人验证才能继续读取。请打开豆瓣完成验证，过一会儿再点一次收藏栏里的按钮。'); return; }
