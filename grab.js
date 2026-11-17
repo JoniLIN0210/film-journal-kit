@@ -123,7 +123,7 @@
     const withPosters = await new Promise((resolve) => {
       $('h1').textContent = '生成你的观影志';
       say('选一种。两种都会读取你的“看过”列表和每部影片的详情；海报馆会再为每部影片收集各个国家、各个版本的海报，并附上经典海报的赏析。');
-      $('.row').innerHTML = '<button class="solid m1">观影志 + 海报馆<small>用时约多一倍</small></button><button class="m0">只要观影志<small>300 部约 7 分钟</small></button><button class="x">取消</button>'
+      $('.row').innerHTML = '<button class="solid m1">观影志 + 海报馆<small>300 部约 30 分钟</small></button><button class="m0">只要观影志<small>300 部约 7 分钟</small></button><button class="x">取消</button>'
         + '<details class="adv"><summary>高级：加入 TMDB 海报（可选）</summary><p>TMDB 是全球最大的电影资料库，能多收集各语言版本和无字版海报。填入你自己在 themoviedb.org 免费申请的 API 密钥即可；不填就只用豆瓣。密钥只在这次生成中使用，不会保存或上传。</p><input class="tmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB API Key 或 Read Access Token"></details>';
       $('.m1').onclick = () => { TMDB = ($('.tmdb').value || '').trim() || TMDB; resolve(true); };
       $('.m0').onclick = () => resolve(false);
@@ -292,10 +292,10 @@
         const src = img && img.src.replace(/\/view\/photo\/[a-z_]+\//, '/view/photo/m_ratio_poster/').replace(/\.webp$/, '.jpg');
         return { id: li.dataset.id, s: 'd', src, k: k || '海报', g, note, ow: dim[0] || 0, oh: dim[1] || 0, c };
       }).filter((p) => p.id && p.src);
-      // shrink to ~420px wide JPEG (keeps the zip small) and take an 8×8 average-hash fingerprint for de-duplication
+      // shrink to ~360px wide JPEG (keeps the zip small) and take an 8×8 average-hash fingerprint for de-duplication
       const shrink = async (blob) => {
         const bmp = await createImageBitmap(blob);
-        const W = Math.min(420, bmp.width), H = Math.round(bmp.height * W / bmp.width);
+        const W = Math.min(360, bmp.width), H = Math.round(bmp.height * W / bmp.width);
         const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
         const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0, W, H);
         const t = document.createElement('canvas'); t.width = t.height = 8;
@@ -304,7 +304,7 @@
         for (let i = 0; i < 64; i++) gray.push(px[i * 4] * 0.3 + px[i * 4 + 1] * 0.59 + px[i * 4 + 2] * 0.11);
         const avg = gray.reduce((x, y) => x + y, 0) / 64;
         if (bmp.close) bmp.close();
-        return { blob: await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8)), w: W, h: H, hash: gray.map((v) => (v > avg ? 1 : 0)) };
+        return { blob: await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.76)), w: W, h: H, hash: gray.map((v) => (v > avg ? 1 : 0)) };
       };
       const same = (a, b) => { let d = 0; for (let i = 0; i < 64; i++) d += a[i] !== b[i]; return d <= 6; };
       // download + shrink in parallel; keeping (with de-duplication) happens afterwards, in priority order
