@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{me} 的年度观影报告</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="block hero t-blue">
+  <div class="wrap">
+    <div class="bar">
+      <a class="brand" href="index.html"><span class="me" data-me></span>的观影志<i>Film Journal</i></a>
+      <nav class="mono"><span id="asof"></span><button class="pill" data-share>分享 ↗</button><a class="pill solid" href="index.html">← 回到主页</a></nav>
+    </div>
+  </div>
+  <div class="wrap stage">
+    <div class="seal" aria-hidden="true"></div>
+    <div class="mono" style="margin-bottom:10px">Special Issue　/　<span data-me></span> 的年度特刊</div>
+    <h1 class="latin" id="year-h1"></h1>
+    <div class="script">A Year in Film</div>
+    <div class="intro">
+      <p id="cover-p"></p>
+      <div class="mono">Scroll ↓</div>
+    </div>
+  </div>
+</header>
+<div class="reel" aria-hidden="true"><div class="track" id="reel"></div></div>
+
+<main>
+  <section class="t-white" style="padding-top:clamp(56px,7vw,100px)">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">01 — Overview</div><h2>这一年<i>at a glance</i></h2><p>按豆瓣“看过”的标记日期统计。</p></div>
+      <p class="lede reveal" id="s1-lede"></p>
+      <div class="figures reveal" id="s1-figs" style="margin-top:clamp(56px,7vw,100px)"></div>
+    </div>
+  </section>
+
+  <section class="t-black">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">02 — Calendar</div><h2>月历<i>month by month</i></h2><p>每个月按下了多少次“看过”，以及看完的每一部。</p></div>
+      <div class="reveal" id="c-months"></div>
+      <div class="callout reveal" id="s2-call"></div>
+      <div id="diary-body" style="margin-top:clamp(48px,6vw,88px)"></div>
+    </div>
+  </section>
+
+  <section class="t-white">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">03 — First &amp; Latest</div><h2>首与尾<i>bookends</i></h2><p>今年的第一部，和到目前为止的最后一部。</p></div>
+      <div class="two-up reveal" id="s3"></div>
+    </div>
+  </section>
+
+  <section class="t-blue">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">04 — Genres &amp; Places</div><h2>类型与产地<i>where &amp; what</i></h2><p id="s4-p"></p></div>
+      <div class="charts reveal">
+        <div class="chart"><h4>类型</h4><p class="note">一部影片可属于多个类型</p><div id="c-genres"></div></div>
+        <div class="chart"><h4>国家 / 地区</h4><p class="note" id="country-note"></p><div id="c-countries"></div></div>
+        <div class="chart"><h4>语言</h4><p class="note">影片中出现的语言</p><div id="c-langs"></div></div>
+        <div class="chart"><h4>影片年代</h4><p class="note" id="decade-note"></p><div id="c-decades"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-white">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">05 — Names</div><h2>名字<i>on repeat</i></h2><p>今年看了不止一部作品的导演，和出镜最多的演员。</p></div>
+      <div class="charts reveal">
+        <div class="chart"><h4>导演</h4><p class="note">由豆瓣条目简介解析，个别条目可能缺失</p><ol class="rank" id="c-directors"></ol></div>
+        <div class="chart"><h4>演员</h4><p class="note">按主要演员表（每部前六位）统计</p><ol class="rank" id="c-actors"></ol></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-lime">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">06 — Superlatives</div><h2>之最<i>the most</i></h2><p></p></div>
+      <div class="callout reveal" id="s6" style="margin-top:0;border-top:0"></div>
+    </div>
+  </section>
+
+  <section class="t-black">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">07 — Five Stars</div><h2>五星片单<i>★★★★★</i></h2><p id="s7-p"></p></div>
+      <div class="strip reveal" id="five"></div>
+    </div>
+  </section>
+
+  <section class="t-white" id="words">
+    <div class="wrap">
+      <div class="head reveal"><div class="idx mono">08 — Notes</div><h2>写下的话<i>in <span data-me></span>'s words</i></h2><p id="s8-p"></p></div>
+      <div class="notes" id="quotes"></div>
+    </div>
+  </section>
+
+  <section class="t-blue fin">
+    <div class="wrap">
+      <div class="mono reveal" style="margin-bottom:28px">Fin.</div>
+      <div class="big reveal" id="fin"></div>
+      <p class="reveal" style="margin-top:48px"><a class="pill mono" style="text-decoration:none;display:inline-block;padding:14px 30px !important" href="index.html">← 回到观影志</a></p>
+    </div>
+  </section>
+</main>
+<footer class="t-black"><div class="wrap mono"><span>Curated by <span data-me></span> — 2026 年度特刊</span><span>数据来自我的豆瓣“看过”列表 · 海报版权归各片方所有</span></div></footer>
+
+<script>/* always load the freshest data after an update */ document.write('<script src="data/movies.js?v=' + Date.now() + '"><\/script>');</script>
+<script src="assets/common.js"></script>
+<script>
+const allYears = tally(M, (m) => m.date.slice(0, 4)).map((x) => x[0]).sort();
+const YEAR = +(new URLSearchParams(location.search).get('y')) || +allYears[allYears.length - 1];
+const Y = M.filter((m) => m.date.startsWith(String(YEAR))).sort((a, b) => a.date.localeCompare(b.date));
+const P = M.filter((m) => m.date.startsWith(String(YEAR - 1)));
+const md = (d) => `${+d.slice(5, 7)} 月 ${+d.slice(8, 10)} 日`;
+const hide = (id) => { const el = $(id).closest('section'); if (el) el.hidden = true; };
+document.title = `${ME} 的 ${YEAR} 年度观影报告`;
+$('#year-h1').textContent = YEAR;
+document.querySelector('footer span').textContent = `Curated by ${ME} — ${YEAR} 年度特刊`;
+
+if (!Y.length) {
+  $('#cover-p').textContent = `${YEAR} 年还没有标记过影视。`;
+  document.querySelector('main').hidden = true; document.querySelector('.reel').hidden = true;
+} else {
+const first = Y[0], last = Y[Y.length - 1];
+const fives = Y.filter((m) => m.r === 5), notes = Y.filter((m) => m.cm);
+const hours = Math.round(sum(Y, (m) => m.rt) / 60);
+
+/* cover */
+$('#asof').textContent = `数据截至 ${last.date.replace(/-/g, '.')}`;
+$('#cover-p').innerHTML = `${md(first.date)}到${md(last.date)}，<b>${Y.length}</b> 部影视，<b>${hours}</b> 个小时。一份只属于 ${esc(ME)} 的年度观影报告。`;
+const reelSet = (fives.length >= 10 ? fives : Y).filter((m) => m.p).slice(-18).reverse();
+$('#reel').innerHTML = (reelSet.length >= 6 ? [...reelSet, ...reelSet] : reelSet).map((m) => posterHTML(m)).join('');
+
+/* 01 */
+const days = new Set(Y.map((m) => m.date)).size, diff = Y.length - P.length;
+const isPast = YEAR < new Date().getFullYear();
+$('#s1-lede').innerHTML = `${YEAR} 年${isPast ? '' : '到目前为止'}，${esc(ME)} 标记了<b>${Y.length}</b>部影视${P.length ? `，比 ${YEAR - 1} 全年${diff >= 0 ? '多' : '少'}<b>${Math.abs(diff)}</b>部` : ''}。它们加起来约<b>${hours}</b>小时——相当于不眠不休地看上<b>${(hours / 24).toFixed(1)}</b>天。`;
+$('#s1-figs').innerHTML = figuresHTML([
+  [Y.length, '部影视', 'Films this year'], [days, '个观影日', 'Days with a mark'], [fives.length, '部五星', 'Five-star picks'], [notes.length, '篇短评', 'Notes written'],
+]);
+
+/* 02 */
+const lastMonth = isPast ? 12 : +last.date.slice(5, 7);
+const months = Array.from({ length: 12 }, (_, i) => { const ms = Y.filter((m) => +m.date.slice(5, 7) === i + 1); return [`${i + 1}月`, ms.length, ms.slice(0, 3).map((x) => x.t).join('、')]; });
+columns($('#c-months'), months);
+const busyM = months.slice().sort((a, b) => b[1] - a[1])[0];
+const quiet = months.slice(0, lastMonth).sort((a, b) => a[1] - b[1])[0];
+const busyD = tally(Y, (m) => m.date)[0];
+const wk = tally(Y, (m) => '日一二三四五六'[new Date(m.date + 'T00:00:00').getDay()])[0];
+const call = (rows) => rows.map(([v, u, k, d]) => `<div><div class="v">${esc(v)}<small>${esc(u)}</small></div><div class="k label">${esc(k)}</div><div class="d">${esc(d)}</div></div>`).join('');
+$('#s2-call').innerHTML = call([
+  [busyM[1], `部 · ${busyM[0]}`, 'Busiest month', `最高产的月份；最安静的是 ${quiet[0]}（${quiet[1]} 部）`],
+  [busyD[1], `部 · ${md(busyD[0])}`, 'Busiest day', `${busyD[2].slice(0, 3).map(film).join('')}${busyD[1] > 3 ? ' 等' : ''}`],
+  [wk[1], `部 · 周${wk[0]}`, 'Favourite weekday', '最常按下“看过”的一天'],
+]);
+$('#diary-body').innerHTML = diaryHTML(Y);
+
+/* 03 */
+$('#s3').innerHTML = featureHTML(first, `First — ${md(first.date)}`) + (last !== first ? featureHTML(last, `Latest — ${md(last.date)}`) : '');
+document.querySelectorAll('#s3 blockquote').forEach((b) => { if (b.textContent.length > 110) b.textContent = b.textContent.slice(0, 110) + '……'; });
+
+/* 04 */
+const genres = tally(Y, (m) => m.g), countries = tally(Y, (m) => m.c), langs = tally(Y, (m) => m.l);
+$('#s4-p').textContent = genres.length ? `今年的关键词是“${genres.slice(0, 3).map((g) => g[0]).join('、')}”。足迹遍及 ${countries.length} 个国家和地区，听了 ${langs.length} 种语言。` : '';
+hbars($('#c-genres'), genres.slice(0, 10));
+hbars($('#c-countries'), countries.slice(0, 10));
+$('#country-note').textContent = `共 ${countries.length} 个，合拍片分别计入`;
+hbars($('#c-langs'), langs.slice(0, 8));
+const withY = Y.filter((m) => m.y);
+if (withY.length) columns($('#c-decades'), decadeRows(withY));
+const newOnes = withY.filter((m) => m.y === YEAR).length;
+$('#decade-note').textContent = `${newOnes} 部是 ${YEAR} 年的新片，其余 ${withY.length - newOnes} 部都在补旧课`;
+
+/* 05 */
+const dirs = tally(Y, (m) => m.d).filter((x) => x[1] >= 2).slice(0, 8);
+const acts = tally(Y, (m) => m.a).filter((x) => x[1] >= 2).slice(0, 8);
+$('#c-directors').innerHTML = dirs.length ? rankHTML(dirs) : '<li style="display:block">今年没有重复看同一位导演——每一部都来自不同的人。</li>';
+$('#c-actors').innerHTML = acts.length ? rankHTML(acts) : '<li style="display:block">今年没有重复出现的演员。</li>';
+
+/* 06 */
+const byY = withY.slice().sort((a, b) => a.y - b.y), byRt = Y.filter((m) => m.rt).sort((a, b) => a.rt - b.rt);
+const longest = byRt[byRt.length - 1], longNote = notes.slice().sort((a, b) => b.cm.length - a.cm.length)[0];
+const facts = [
+  byY[0] && [byY[0].y, '年', 'Oldest film', `最老的一部：${film(byY[0])}，距今 ${YEAR - byY[0].y} 年`],
+  longest && [longest.rt, '分钟', 'Longest', `最长的一部：${film(longest)}${longest.tv && longest.ep ? `（${longest.ep} 集）` : ''}`],
+  longNote ? [longNote.cm.length, '字', 'Longest note', `最长的一篇短评，写给${film(longNote)}`] : (byRt[0] && byRt[0] !== longest ? [byRt[0].rt, '分钟', 'Shortest', `最短的一部：${film(byRt[0])}`] : null),
+].filter(Boolean);
+if (facts.length) $('#s6').innerHTML = call(facts); else hide('#s6');
+
+/* 07 */
+const ratedY = Y.filter((m) => m.r);
+if (fives.length) {
+  $('#s7-p').textContent = `今年评过分的 ${ratedY.length} 部里，${fives.length} 部拿到了五星，平均 ${(sum(ratedY, (m) => m.r) / ratedY.length).toFixed(1)} 星。`;
+  $('#five').innerHTML = fives.slice().reverse().map((m) => `<button class="mini" data-film="${m.id}">${posterHTML(m)}<span class="t">${esc(m.t)}</span></button>`).join('');
+} else hide('#five');
+
+/* 08 */
+if (notes.length) {
+  $('#s8-p').textContent = `今年写下的全部 ${notes.length} 篇短评，共 ${sum(notes, (m) => m.cm.length).toLocaleString('en-US')} 字。`;
+  $('#quotes').innerHTML = notes.slice().sort(byDateDesc).map(noteHTML).join('');
+} else { $('#words').hidden = true; }
+
+$('#fin').innerHTML = `<em>${Y.length}</em> 部影视<br><em>${hours}</em> 个小时<br>下一部见。`;
+
+/* share */
+initShare(() => ({
+  title: String(YEAR), latin: true, script: 'A Year in Film',
+  para: `${ME} 的 ${YEAR} 年度观影报告：${md(first.date)}到${md(last.date)}，${Y.length} 部影视，${hours} 个小时。`,
+  figures: [[Y.length, '部影视', 'Films this year'], [hours, '小时', 'Total runtime'], [fives.length, '部五星', 'Five-star picks'], [notes.length, '篇短评', 'Notes written']],
+  charts: [{ title: '年度类型 Top 5', rows: genres.slice(0, 5) }, { title: '国家 / 地区 Top 5', rows: countries.slice(0, 5) }],
+  facts: [[busyM[1], '部', `最高产的月份：${busyM[0]}`], ...facts.slice(0, 2).map(([v, u, , d]) => [v, u, d])],
+  postersTitle: fives.length >= 4 ? '年度五星' : '今年看过', postersEn: fives.length >= 4 ? '★★★★★' : 'this year',
+  posters: (fives.length >= 4 ? fives : Y).filter((m) => m.p).slice(-12).reverse(),
+  quote: longNote ? { text: longNote.cm, by: `${ME} 写给${film(longNote)} · ${longNote.date}` } : null,
+}), `film-journal-${YEAR}.png`);
+}
+initReveal();
+</script>
+</body>
+</html>
