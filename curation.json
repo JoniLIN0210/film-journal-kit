@@ -3,7 +3,6 @@
     "title": "寄生虫",
     "items": [
       {
-        "photo": "2561439800",
         "kind": "正式海报",
         "region": "韩国",
         "designer": "Kim Sang-man 김상만",
@@ -18,7 +17,9 @@
             "name": "Fonts In Use",
             "url": "https://fontsinuse.com/uses/28625/parasite-movie-poster-and-trailer"
           }
-        ]
+        ],
+        "tmdb": "/eJ0kCMcqKLBUaHhB9PfOMFu2uim.jpg",
+        "photo": "2561439800"
       }
     ]
   },
@@ -26,7 +27,6 @@
     "title": "瞬息全宇宙",
     "items": [
       {
-        "photo": "2869765076",
         "kind": "预告海报",
         "region": "美国",
         "designer": "James Jean",
@@ -41,7 +41,9 @@
             "name": "SVA",
             "url": "https://sva.edu/features/alumnus-james-jean-on-the-oscar-nominated-posters-he-designed-this-year-2"
           }
-        ]
+        ],
+        "tmdb": "/u68AjlvlutfEIcpmbYpKcdi09ut.jpg",
+        "photo": "2869765076"
       }
     ]
   },
@@ -49,7 +51,6 @@
     "title": "千与千寻",
     "items": [
       {
-        "photo": "2559579043",
         "kind": "正式海报",
         "region": "中国大陆",
         "designer": "黄海 Huang Hai",
@@ -64,7 +65,9 @@
             "name": "文汇报",
             "url": "https://wenhui.whb.cn/zhuzhan/xinwen/20190803/281079.html"
           }
-        ]
+        ],
+        "tmdb": "/9oZmkkNlI4Ktx6NTkdpeU525qSc.jpg",
+        "photo": "2559579043"
       }
     ]
   },
@@ -72,7 +75,6 @@
     "title": "龙猫",
     "items": [
       {
-        "photo": "2540924496",
         "kind": "正式海报",
         "region": "中国大陆",
         "designer": "黄海 Huang Hai",
@@ -83,7 +85,9 @@
             "name": "文汇报",
             "url": "https://wenhui.whb.cn/zhuzhan/xinwen/20190803/281079.html"
           }
-        ]
+        ],
+        "tmdb": "/okAv5Q1ad2WMt7hxsXUyolfE6zA.jpg",
+        "photo": "2540924496"
       }
     ]
   },
@@ -91,7 +95,6 @@
     "title": "小偷家族",
     "items": [
       {
-        "photo": "2529044840",
         "kind": "正式海报",
         "region": "中国大陆",
         "designer": "黄海 Huang Hai",
@@ -106,7 +109,9 @@
             "name": "MUBI Notebook",
             "url": "https://mubi.com/en/notebook/posts/the-best-movie-posters-of-2018"
           }
-        ]
+        ],
+        "tmdb": "/4nfRUOv3LX5zLn98WS1WqVBk9E9.jpg",
+        "photo": "2529044840"
       }
     ]
   },
@@ -114,7 +119,6 @@
     "title": "楚门的世界",
     "items": [
       {
-        "photo": "479682972",
         "kind": "正式海报",
         "region": "美国",
         "designer": "Robert Silvers · Runaway Technology",
@@ -125,7 +129,9 @@
             "name": "Robert Silvers",
             "url": "https://archive.photomosaic.com/bio.html"
           }
-        ]
+        ],
+        "tmdb": "/vuza0WqY239yBXOadKlGwJsZJFE.jpg",
+        "photo": "479682972"
       }
     ]
   },
@@ -143,7 +149,8 @@
             "name": "Dazed",
             "url": "https://www.dazeddigital.com/art-photography/article/48109/1/akiko-stehrenberger-the-artist-behind-your-favourite-film-posters-honey-boy"
           }
-        ]
+        ],
+        "tmdb": "/kxybd00WzDacNvh82RahMhQJqTb.jpg"
       }
     ]
   },
@@ -151,7 +158,6 @@
     "title": "路边野餐",
     "items": [
       {
-        "photo": "2366570716",
         "kind": "正式海报",
         "region": "中国大陆",
         "designer": "陆云帆 Lu Yunfan",
@@ -166,7 +172,9 @@
             "name": "优设",
             "url": "https://www.uisdc.com/movie-poster-design"
           }
-        ]
+        ],
+        "tmdb": "/GNz0dyRCGjqpnuigKpwJJqlyoV.jpg",
+        "photo": "2366570716"
       }
     ]
   },
@@ -174,7 +182,6 @@
     "title": "黑客帝国",
     "items": [
       {
-        "photo": "2432313490",
         "kind": "正式海报",
         "designer": "Concept Arts（海报）· Tim Girvin（片名字标）",
         "headline": "片名本身就像一段出了错的代码。",
@@ -183,6 +190,857 @@
           {
             "name": "Fonts In Use",
             "url": "https://fontsinuse.com/uses/48789/the-matrix-1999-movie-posters"
+          }
+        ],
+        "tmdb": "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+        "photo": "2432313490"
+      }
+    ]
+  },
+  "1292465": {
+    "title": "愤怒的葡萄",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "美国",
+        "designer": "Thomas Hart Benton（托马斯·哈特·本顿），美国地域主义画家；广告由二十世纪福克斯宣传部门统筹",
+        "headline": "福克斯请来“最美国的美国画家”，让流民的背影替电影说话",
+        "text": "二十世纪福克斯为《愤怒的葡萄》委托美国地域主义画家托马斯·哈特·本顿创作了六幅石版画，作为整套广告的视觉核心。主图《乔德一家出发》被放在81英寸见方的六联张海报正中。\n画面里的人物背对观众、没有面孔，剪影般立在渐暗的天空下。其余几幅是角色肖像，曾陈列在首映影院门口，也夹印在首映纪念册里。\n到了标准单张海报上，这幅画却只从一张黑白合影后面露出一角，半张海报则把它染成黄色、配上演员头像。MUBI 的 Adrian Curry 用这组素材，梳理了同一幅画在不同尺寸物料上的取舍。",
+        "sources": [
+          {
+            "name": "MUBI Notebook – Movie Poster of the Week: Thomas Hart Benton and “The Grapes of Wrath”（Adrian Curry, 2025）",
+            "url": "https://mubi.com/en/notebook/posts/movie-poster-of-the-week-thomas-hart-benton-and-the-grapes-of-wrath"
+          }
+        ]
+      }
+    ]
+  },
+  "1291879": {
+    "title": "罗生门",
+    "items": [
+      {
+        "kind": "首映海报（西德发行版）",
+        "region": "西德",
+        "designer": "Hans Hillmann（汉斯·希尔曼，1925–2014），德国平面设计师",
+        "headline": "一张画里切出几种视角，海报自己也成了一场“罗生门”",
+        "text": "这是1959年《罗生门》在西德发行时的海报，作者是德国设计师汉斯·希尔曼。他1954到1974年间的电影海报大多为发行公司 Neue Filmkunst 所作，他留下的档案里有164张电影海报。\n设计师 Caspar Newbolt 把它列入自己最喜爱的海报，他的说法是：海报和电影一样，对同一事件给出几种视角，各段片段被切开又接上，拼成一对男女激烈纠缠的破碎图像。他还说，这明明是水彩画，看上去却像电影、像摄影。\nMUBI 的 Adrian Curry 在“黑泽明在海外”专题里也以这张海报开篇。",
+        "sources": [
+          {
+            "name": "MUBI Notebook – Kurosawa Abroad（Adrian Curry, 2018）",
+            "url": "https://mubi.com/en/notebook/posts/movie-poster-of-the-week-kurosawa-abroad"
+          },
+          {
+            "name": "MUBI Notebook – Caspar Newbolt 最爱的十张海报",
+            "url": "https://mubi.com/pt/notebook/posts/movie-poster-of-the-week-ponderosa-and-the-top-ten-favorite-movie-posters-of-designer-caspar-newbolt"
+          },
+          {
+            "name": "MUBI Notebook – The Hans Hillmann Archive（Adrian Curry, 2021）",
+            "url": "https://mubi.com/en/notebook/posts/movie-poster-of-the-week-the-hans-hillmann-archive"
+          }
+        ]
+      }
+    ]
+  },
+  "1432669": {
+    "title": "我是古巴",
+    "items": [
+      {
+        "kind": "正式海报（古巴发行版）",
+        "region": "古巴",
+        "designer": "René Portocarrero（雷内·波托卡雷罗，1912–1985），古巴画家",
+        "headline": "古巴大画家难得出手做海报，也为这部电影设计了戏服",
+        "text": "苏联与古巴合拍的《我是古巴》，古巴版海报出自画家雷内·波托卡雷罗之手。他以狂欢节意象和本土文化传统闻名，也为国家医院、国家剧院等建筑画过壁画。在这部电影上，他同时设计了海报和戏服。\n海报由古巴电影艺术与工业学院（ICAIC）用丝网印刷出版。乔治城大学的古巴电影海报展介绍，ICAIC 的海报是推广本国艺术家的阵地，风格融合了摄影、抽象表现主义、波普和新艺术运动。\n这张海报还被收录进 David Craven 的著作《拉丁美洲的艺术与革命 1910–1990》。",
+        "sources": [
+          {
+            "name": "Georgetown University Library – Soy Cuba: The Art of the Film Poster in Cuba",
+            "url": "https://library.georgetown.edu/exhibition/soy-cuba-art-film-poster-cuba"
+          },
+          {
+            "name": "A&AePortal（Craven, Art and Revolution in Latin America 收录条目）",
+            "url": "https://aaeportal.com/images/19621/soy-cuba-i-am-cuba-poster-for-the-icaic-to-promote-the-film-soy-cuba-by-mikhail-kalatozov"
+          },
+          {
+            "name": "WorthPoint（经销商记录，仅作画面与尺寸参考）",
+            "url": "https://www.worthpoint.com/worthopedia/cuban-silkscreen-movie-poster-soy-1815363273"
+          }
+        ],
+        "tmdb": "/cZ4k3RKK00JrMafinws4txq28be.jpg"
+      }
+    ]
+  },
+  "1294408": {
+    "title": "音乐之声",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "美国",
+        "designer": "Howard Terpning（霍华德·特尔平），美国插画家",
+        "headline": "阿尔卑斯草地上的玛丽亚，撑起了“全世界最快乐的声音”",
+        "text": "《音乐之声》的首映海报画作出自美国插画家霍华德·特尔平，维基百科在影片条目的海报说明中直接标明了他的名字。\n导演罗伯特·怀斯请 Mike Kaplan 主持宣传。Kaplan 定下广告语“The Happiest Sound in All the World”，并请外部广告公司和制片厂广告部一起做海报。最后选中的就是特尔平这幅画：朱莉·安德鲁斯在阿尔卑斯草地上，孩子们和普卢默在她身后。\n同一幅画后来也用在了法国大海报等海外版本上。",
+        "sources": [
+          {
+            "name": "Wikipedia – The Sound of Music (film)（Marketing 一节）",
+            "url": "https://en.wikipedia.org/wiki/The_Sound_of_Music_(film)"
+          },
+          {
+            "name": "Original Film Art（法国版沿用，经销商）",
+            "url": "https://www.originalfilmart.com/products/the-sound-of-music-fr"
+          }
+        ],
+        "tmdb": "/5qQTu2iGTiQ2UvyGp0beQAZ2rKx.jpg"
+      }
+    ]
+  },
+  "1303543": {
+    "title": "玩乐时间",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "法国",
+        "designer": "René Ferracci（勒内·费拉奇，1927–1982）与 Baudin",
+        "headline": "网格与小人，把塔蒂的玻璃都市压进一张纸里",
+        "text": "《玩乐时间》1967年法国首映海报由勒内·费拉奇和 Baudin 合作完成。一份拍卖记录写的是“Baudin 构图，Ferracci 绘制”。\n法国电影资料馆收藏了这张海报的“1号设计稿”：一张在复印纸上用彩色铅笔和石墨画成的草图，32.4×21厘米，署两人名字，年份1967。从草图到成品的过程因此有了实物证据。\n成品用网格状的抽象结构暗示片中的现代化城市，上面散布着彩色小人。",
+        "sources": [
+          {
+            "name": "Cinémathèque française / Ciné-Ressources – Playtime [Maquette d'affiche n°1]",
+            "url": "http://www.cineressources.net/ressource.php?collection=DESSINS&pk=12251"
+          },
+          {
+            "name": "The Vintage Poster（经销商）",
+            "url": "https://www.thevintageposter.com/poster-detail/?inv=11217B&at=ReneFerracci"
+          },
+          {
+            "name": "Interencheres 拍卖记录",
+            "url": "https://www.interencheres.com/art-decoration/vente-daffiches-de-cinema-671488/lot-85732030.html"
+          }
+        ],
+        "tmdb": "/h0jUOIr8LKESwelppaNkqQrVu7C.jpg"
+      }
+    ]
+  },
+  "1292472": {
+    "title": "巴里·林登",
+    "items": [
+      {
+        "kind": "正式海报 / 重映海报",
+        "region": "法国（多国沿用）",
+        "designer": "Jouineau Bourduge（茹伊诺·布尔迪热），法国海报画家",
+        "headline": "白底、黑靴、一朵红玫瑰，三个元素讲完一生的决斗",
+        "text": "说到《巴里·林登》，影迷最常想起的是这张极简海报：大片留白，一个黑色剪影般的男人穿靴持枪，脚下是一朵红玫瑰。维基百科影片条目用的就是它，说明为“Jouineau Bourduge 设计的重映海报”。\n经销商记录显示，这个设计不只用于重映：法国1976年首映、阿根廷1975年底和英国1976年获奖后发行的版本都用了它。\n美国单张版则是另一套设计，由 Bill Gold 设计、Charles Gehm 绘画。",
+        "sources": [
+          {
+            "name": "Wikipedia – Barry Lyndon（海报说明）",
+            "url": "https://en.wikipedia.org/wiki/Barry_Lyndon"
+          },
+          {
+            "name": "Original Film Art（法国/阿根廷版，经销商）",
+            "url": "https://www.originalfilmart.com/products/barry-lyndon-fr-r83"
+          },
+          {
+            "name": "Film on Paper（美国30×40版，Bill Gold/Charles Gehm）",
+            "url": "https://www.filmonpaper.com/posters/barry-lyndon-30x40-usa/"
+          }
+        ],
+        "tmdb": "/3YJEv83HWWgCKezTiQ9LhdR7cFU.jpg"
+      }
+    ]
+  },
+  "1291999": {
+    "title": "重庆森林",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "中国香港",
+        "designer": "又一山人（黄炳培 / Stanley Wong Ping Pui, anothermountainman）",
+        "headline": "假发、委任证、碎片人像：一张拼贴就是王家卫的香港",
+        "text": "《重庆森林》香港首映海报由又一山人（黄炳培）设计，现在是香港 M+ 博物馆的藏品，2017年由设计师本人捐赠，编号2017.153。\n画面是剧照人像和物件的拼贴，繁体片名放在正中。画面里能看到一顶棕色假发和一张警察委任证，左侧还有竖排文字。这张海报曾在 M+ 的展览 Ambiguously Yours: Gender in Hong Kong Popular Culture（2017）中展出，后来又在“The Cabinet”中展出。\n黄炳培长期从事广告与设计，自称“视觉传达的社工”，他的“红白蓝”系列曾参展2005年威尼斯双年展。",
+        "sources": [
+          {
+            "name": "M+ Collection – Poster, 'Chungking Express' (1994)",
+            "url": "https://www.mplus.org.hk/en/collection/objects/poster-chungking-express-2017153/"
+          }
+        ],
+        "tmdb": "/ejkczWHjQoNAPUmTU26tU3aRkr8.jpg"
+      }
+    ]
+  },
+  "1292679": {
+    "title": "春光乍泄",
+    "items": [
+      {
+        "kind": "正式海报（香港上映版）",
+        "region": "中国香港",
+        "designer": "黄新满（Wong Sun Mun）设计，摄影夏永康（Wing Shya）",
+        "headline": "牛皮纸、两次过机，印出一层带绿带黄的淡湖蓝",
+        "text": "据杜翰扬的设计师访谈集《The Next Stage 2》，《春光乍泄》的海报由设计师黄新满和摄影师夏永康合作。\n参加第五十届戛纳电影节的主视觉，起点是夏永康在阿根廷酒店房间里即兴做的照片拼贴，用了剪切、烟头烫痕和咖啡渍。团队前后做了近百款，挑出三分之一送到泽东电影公司，由王家卫和张叔平选定。\n香港上映版改用夏永康在片场对面大楼拍下的梁朝伟、张国荣天台剧照。纸张选了质感粗糙的白牛皮纸，印好后再过一次印刷机，得到带绿带黄的淡湖蓝。",
+        "sources": [
+          {
+            "name": "VERSE – 王家衛電影《春光乍洩》、《二○四六》經典海報是如何設計出來的？（摘自杜翰煬《The Next Stage 2》）",
+            "url": "https://www.verse.com.tw/article/Leumas-To-The-Next-Stage-2"
+          }
+        ],
+        "tmdb": "/ulfbE6oerBj5iVqaYgVVvhT58UP.jpg"
+      }
+    ]
+  },
+  "1294194": {
+    "title": "悲情城市",
+    "items": [
+      {
+        "kind": "前导海报（国际版）",
+        "region": "中国台湾",
+        "designer": "刘开（Liu Kai）",
+        "headline": "电影还没开拍，水墨与金纸已先替它哀悼",
+        "text": "《悲情城市》最著名的海报，是刘开在电影开拍前设计的国际前导海报。当时还没有剧照，侯孝贤只是口头给他讲了故事。副导演黄健和记得，刘开对着一大张宣纸挥毫，侯孝贤看了第一反应是“這個很厲害喔”。\n1988年，也就是威尼斯获奖前一年，年代公司把这张海报连同卖片资料带去戛纳电影市场做国际推广。后来的版本在金纸位置和片名排法上有所不同。\n台湾院线上映时并没有用这张，改用画家刘志飞专为台湾观众画的版本，配吴念真写的文案。",
+        "sources": [
+          {
+            "name": "BIOS monthly –《悲情城市》新舊海報，與它們背後的時代（2023）",
+            "url": "https://www.biosmonthly.com/article/11232"
+          }
+        ],
+        "tmdb": "/mUD0o9j4OlVztPlgO29MGAKYs2G.jpg"
+      }
+    ]
+  },
+  "1295644": {
+    "title": "这个杀手不太冷",
+    "items": [
+      {
+        "kind": "正式海报（法国版）",
+        "region": "法国",
+        "designer": "Laurent Lufroy（劳伦·吕弗鲁瓦），法国电影海报设计师",
+        "headline": "接到贝松电话时他在新喀里多尼亚，最后还是用丙烯一笔笔画出了里昂",
+        "text": "《这个杀手不太冷》的法国海报出自劳伦·吕弗鲁瓦。他19岁就开始为好莱坞片商工作，一生做过约800张电影海报，《天使爱美丽》《艺术家》的法国海报也是他的作品。\n据卢瓦尔省的人物专访，吕弗鲁瓦和贝松原本约好在影片上映前再联系。电话打来时，他正在新喀里多尼亚环游世界。他列了一张画材清单让人用 DHL 寄来，就地开工，自己说那时“还用手画，丙烯加小画笔”。\n苏富比拍卖说明称，他“出色地捕捉了”让·雷诺饰演的里昂。",
+        "sources": [
+          {
+            "name": "Département de la Loire – Laurent Lufroy, tout en haut de l'affiche",
+            "url": "https://www.loire.fr/jcms/lw_1435711/fr/-portrait-laurent-lufroy-tout-en-haut-de-l-affiche"
+          },
+          {
+            "name": "Sotheby's – Leon (1994) Poster, French",
+            "url": "https://www.sothebys.com/en/buy/auction/2020/original-film-posters-online/leon-1994-poster-french-signed-by-luc-besson-jean"
+          },
+          {
+            "name": "École alsacienne – Flash Cinéma: rencontre avec Laurent Lufroy",
+            "url": "https://www.ecole-alsacienne.org/flash-cinema-rencontre-avec-laurent-lufroy/"
+          }
+        ]
+      }
+    ]
+  },
+  "1292052": {
+    "title": "肖申克的救赎",
+    "items": [
+      {
+        "kind": "重映海报（十周年）",
+        "region": "美国",
+        "designer": "Drew Struzan（德鲁·斯特鲁赞）绘画",
+        "headline": "导演亲自请来斯特鲁赞，把雨中张臂那一幕重新画了一遍",
+        "text": "1994年首映时，美国单张海报只用了一张照片：越狱后的安迪（蒂姆·罗宾斯）在雨中张开双臂。\n2004年十周年短期重映，导演弗兰克·德拉邦特亲自找到插画家德鲁·斯特鲁赞。斯特鲁赞回忆，德拉邦特最后选了他重画的“雨中的蒂姆·罗宾斯”做封面，没用上的习作被德拉邦特挂在自己家里，因为他“爱上了这些画”。斯特鲁赞说，这让他画出了和以往电影海报完全不同的东西。\n注意：有资料把1994年原版也算到斯特鲁赞名下，属于混淆。",
+        "sources": [
+          {
+            "name": "Film on Paper – The Shawshank Redemption / one sheet / 10th anniversary re-release",
+            "url": "https://www.filmonpaper.com/posters/the-shawshank-redemption-one-sheet-10th-anniversary-re-release-usa/"
+          }
+        ],
+        "tmdb": "/mPlopztbARoMahaSgl5oQvR0e4T.jpg"
+      }
+    ]
+  },
+  "1292224": {
+    "title": "飞越疯人院",
+    "items": [
+      {
+        "kind": "正式海报（波兰发行版）",
+        "region": "波兰",
+        "designer": "Andrzej Pągowski（安杰伊·帕戈夫斯基，1953– ），波兰海报画家",
+        "headline": "波兰海报学派的晚期手笔，荆冠与电线缠住了麦克墨菲的头",
+        "text": "《飞越疯人院》1979年在波兰上映时，海报由安杰伊·帕戈夫斯基设计。他生于1953年。波兰画廊把这张海报归入“波兰海报学派黄金时代”的人民共和国时期原版。\n据经销商记录，这张海报为 B1 胶印，印量7480张，画面是尼科尔森头像，配荆冠、头上电线等意象。帕戈夫斯基本人的画廊至今还在出售这张作品的作者授权重印版。",
+        "sources": [
+          {
+            "name": "Andrzej Pągowski Art Gallery（作者官方画廊）",
+            "url": "https://pagowski.pl/pl/p/LOT-NAD-KUKULCZYM-GNIAZDEM/51"
+          },
+          {
+            "name": "Mr Poster（经销商）",
+            "url": "https://www.mrposter.com/product/lot-nad-kukulczym-gniazdem-one-flew-over-the-cuckoos-nest/"
+          },
+          {
+            "name": "Grafiteria.pl（经销商）",
+            "url": "https://grafiteria.pl/en/produkt/one-flew-over-the-cuckoos-nest/"
+          }
+        ]
+      }
+    ]
+  },
+  "1307914": {
+    "title": "无间道",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "中国香港",
+        "designer": "刘伟文（Andrew Lau，导演刘伟强之弟）",
+        "headline": "片名被做成走不出的迷宫，无间地狱从字形开始",
+        "text": "《无间道》海报出自平面设计师刘伟文之手。据香港01专访，他与哥哥刘伟强约在2000年共用办公室，看过试片后主动请缨设计海报；当时共提交二三十款方案，最后采用的正是他的第一稿。\n画面中除两位主角外，其余人物都“行尸走肉”般看不清楚；片名字款则被设计成迷宫，用他的话说，是比喻角色一直离不开这个无间地狱。\n这张海报获片方认可后，他正式入行，此后又设计了《无间道》续集、《头文字D》与《叶问》系列等海报。",
+        "sources": [
+          {
+            "name": "香港01《【專訪】海報師劉偉文《無間道》起家》",
+            "url": "https://www.hk01.com/%E9%9B%BB%E5%BD%B1/188978/%E5%B0%88%E8%A8%AA-%E6%B5%B7%E5%A0%B1%E5%B8%AB%E5%8A%89%E5%81%89%E6%96%87-%E7%84%A1%E9%96%93%E9%81%93-%E8%B5%B7%E5%AE%B6-%E6%9C%80%E7%B7%8A%E8%A6%81%E4%BF%BE%E5%88%B0%E8%A7%80%E7%9C%BE%E4%B8%80%E4%BB%BD%E6%9C%9F%E5%BE%85"
+          }
+        ]
+      }
+    ]
+  },
+  "1418834": {
+    "title": "断背山",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "美国",
+        "designer": "BLT Communications, LLC（洛杉矶电影广告公司）",
+        "headline": "一张西部片海报，刻意照着《泰坦尼克号》来做",
+        "text": "据《新闻周刊》2005年报道（经Posterwire转引），制片人詹姆斯·沙姆斯（James Schamus）没有去参考西部片海报，而是研究了“史上最浪漫的50部电影”的海报，并坦言：“看我们的海报，你能看出灵感来源《泰坦尼克号》的痕迹。”\nPosterwire将两张海报并置比较，认为二者几乎如出一辙，连莱杰肩膀的轮廓都对应着《泰坦尼克号》海报上船身的位置。\n这种“借壳”策略把一部牛仔题材电影包装成主流爱情史诗；海报随后也被大量恶搞改图。",
+        "sources": [
+          {
+            "name": "Posterwire: The Cowboy Way",
+            "url": "https://posterwire.com/the-cowboy-way/"
+          },
+          {
+            "name": "The Genealogy of Style: Star-Crossed Lovers",
+            "url": "https://thegenealogyofstyle.wordpress.com/2014/02/04/star-crossed-lovers/"
+          }
+        ],
+        "tmdb": "/aByfQOQBNa4CMFwIgq3QrqY2ZHh.jpg"
+      }
+    ]
+  },
+  "1851857": {
+    "title": "蝙蝠侠：黑暗骑士",
+    "items": [
+      {
+        "kind": "预告海报",
+        "region": "美国",
+        "designer": "David Erwin（时任 DC Comics 执行创意总监，主导拍摄）",
+        "headline": "小丑隔着雾玻璃写下一句问话，比正脸更让人不安",
+        "text": "这张海报是《黑暗骑士》在2008年上映前长达数月的预告营销的一部分。\n据SYFY WIRE 2024年对前DC Comics执行创意总监David Erwin的采访，小丑隔着磨砂玻璃写字的这张出自他的团队；他说宣传物料的拍摄都由自己导演，是专门的棚拍而非电影剧照。Erwin回忆，希斯·莱杰会在拍摄间隙进入角色状态。\n文章还提到，华纳消费品部门起初担心宣传物料出现明显武器，要求用Photoshop去掉刀具，诺兰提出质疑后刀具最终被保留。",
+        "sources": [
+          {
+            "name": "SYFY WIRE: Former DC Creative Director Recalls Working with Heath Ledger on The Dark Knight Teaser Posters",
+            "url": "https://www.syfy.com/syfy-wire/former-dc-creative-director-on-directing-heath-ledger-for-the-dark-knight-posters"
+          }
+        ],
+        "tmdb": "/vGYJRor3pCyjbaCpJKC39MpJhIT.jpg"
+      }
+    ]
+  },
+  "3541415": {
+    "title": "盗梦空间",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "美国",
+        "designer": "Ignition（洛杉矶）；概念出自Tomasz Opasinski",
+        "headline": "把街道折起来，一张图就讲清了“梦境可以被改造”",
+        "text": "设计师Tomasz Opasinski在Layered Butter的访谈中回忆，他后来担任洛杉矶Ignition的创意总监，而在此之前他以自由职业身份为《盗梦空间》做了大约十个概念，其中“弯折街道”成为最终海报的核心。\n他说这个概念在众多方案中很快成了自己的最爱，认为它“标志性且与众不同”。当时没有3D素材，团队先用2D拼合；他又请Matt Faulkner制作3D概念验证图说服片方，获批后由外部供应商重新设计渲染。\n他也坦言不确定诺兰是否参与，猜想导演有介入，但消息从未传到他这一层。",
+        "sources": [
+          {
+            "name": "Layered Butter: The Making of the Inception Poster by Thomas Opasinski",
+            "url": "https://layeredbutter.com/editorial/inception-poster"
+          }
+        ]
+      }
+    ]
+  },
+  "3285632": {
+    "title": "都灵之马",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "美国",
+        "designer": "Scott Meola（美国版）；英国版quad海报由Sam Ashby设计",
+        "headline": "一张照片、几行字，灰雾里只有片名是亮的",
+        "text": "MUBI Notebook专栏“Movie Poster of the Week”作者Adrian Curry评价，Scott Meola设计的美国版海报用一张单色照片配上“选择完美、位置无可挑剔”的字体；女孩正被周围的灰雾吸收，片名是画面中唯一的白光。\nCurry在《2012年最佳电影海报》中把本片排在第7：影片几乎只有一张可用的照片——一个衣衫凌乱、提着水桶的女孩，却衍生出三款好设计：Meola的美国版、墨西哥版的戏剧化修图，以及Sam Ashby借用影片文字序幕做成的英国版quad。",
+        "sources": [
+          {
+            "name": "MUBI Notebook: Movie Posters of the Week: Come Back, Africa & The Turin Horse",
+            "url": "https://mubi.com/en/notebook/posts/movie-posters-of-the-week-come-back-africa-the-turin-horse"
+          },
+          {
+            "name": "MUBI Notebook: The Best Movie Posters of 2012",
+            "url": "https://mubi.com/en/notebook/posts/the-best-movie-posters-of-2012"
+          }
+        ],
+        "tmdb": "/2kSElneXSKmMsGL55k0CbPGqLbu.jpg"
+      }
+    ]
+  },
+  "2222996": {
+    "title": "步履不停",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "日本（图中为同一画面的英文版）",
+        "designer": "宣传美术：葛西薫（Kaoru Kasai）、安藤基広；插画及片名手写：吉實恵（Megumi Yoshizane）；剧照：新津保建秀",
+        "headline": "葛西薫操刀，片名由插画家一笔笔手写",
+        "text": "根据影片蓝光的职员表，《步履不停》的宣传美术由日本平面设计大师葛西薫与安藤基広负责，剧照摄影为新津保建秀，插画为吉實恵。\n吉實恵在东京插画家协会（TIS）的作品页写明，她为本片绘制了海报、传单、场刊和明信片插画，并亲手书写了片名字。她的个人网站还列出试映会请柬和GONTITI原声碟封套等物料，委托方为发行商シネカノン（Cinequanon）。\n手写字与插画让整套宣传物保持了家庭相册般的温度。",
+        "sources": [
+          {
+            "name": "V-STORAGE《歩いても 歩いても》Blu-ray 职员表",
+            "url": "https://v-storage.jp/cont/item/?item_detail=BCXJ-1367"
+          },
+          {
+            "name": "TIS 吉實恵 作品页",
+            "url": "https://www.tis-home.com/megumi-yoshizane/works/467"
+          },
+          {
+            "name": "吉實恵 个人网站",
+            "url": "https://www.yoshizane.com/works/advertising/1286"
+          },
+          {
+            "name": "映画チラシサイト",
+            "url": "https://eiga-chirashi.jp/view_item.php?titleid=5221"
+          }
+        ],
+        "tmdb": "/FWJbhAPdwiwKhUaAyz841jpYa1.jpg"
+      }
+    ]
+  },
+  "21324900": {
+    "title": "降临",
+    "items": [
+      {
+        "kind": "预告海报",
+        "region": "中国香港",
+        "designer": "设计者未公开（派拉蒙称出自第三方供应商）",
+        "headline": "一座被P错的塔，让一张预告海报变成政治风波",
+        "text": "派拉蒙在2016年夏天发布了12款地标海报，每款都让飞船悬停在世界某处知名地点上空，配标语“Why are they here?”。\n香港版背景是维多利亚港，但画面最显眼的建筑却是位于上海的东方明珠塔。网民以#HongKongIsNotChina标签抗议，艺术家Sam Luk发布了恶搞版海报。\n2016年8月18日，影片官方账号致歉称：“一张《降临》海报因第三方供应商出错”，表示已更正，并对未能及早发现感到遗憾，随后删除该图。",
+        "sources": [
+          {
+            "name": "CBS News: Residents of Hong Kong outraged by movie poster mistake",
+            "url": "https://www.cbsnews.com/amp/news/arrival-movie-poster-mistake-puts-shanghai-tower-in-hong-kong"
+          },
+          {
+            "name": "Refinery29: Arrival poster Hong Kong Oriental Pearl Tower",
+            "url": "https://www.refinery29.com/en-us/2016/08/120888/arrival-poster-hong-kong-shangai-oriental-pearl-tower"
+          }
+        ]
+      }
+    ]
+  },
+  "25986180": {
+    "title": "釜山行",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "韩国",
+        "designer": "Propaganda（프로파간다，首尔），负责人崔智雄（최지웅）",
+        "headline": "片名像被丧尸抓过，字本身就是一道伤口",
+        "text": "《釜山行》海报出自首尔海报工作室Propaganda。工作室负责人崔智雄在韩国国立韩文博物馆网刊的专访中说，《釜山行》的片名被设计成“被丧尸抓挠过的表面”，因为片名应与作品形象一致。\n他介绍，工作室的片名字体全部手工完成：先用毛笔写，再扫描进电脑处理，每部作品都有专属字体。\n另据《Woman Sense》报道，演员郑有美曾半开玩笑说，别人演逃命时脸都扭曲了，只有自己拍得太干净，心里过意不去。",
+        "sources": [
+          {
+            "name": "국립한글박물관 웹진 한박웃음 2021年3月号：영화 포스터 디자이너 최지웅",
+            "url": "https://www.hangeul.go.kr/webzine/202103/sub3_1.html"
+          },
+          {
+            "name": "우먼센스：영화 포스터 디자인 스튜디오 프로파간다",
+            "url": "http://www.womansense.co.kr/news/articleView.html?idxno=31913"
+          }
+        ],
+        "tmdb": "/53YdBuTPToOHRxQmVYEGQUV7hfV.jpg"
+      }
+    ]
+  },
+  "5045678": {
+    "title": "大鱼海棠",
+    "items": [
+      {
+        "kind": "终极海报",
+        "region": "中国大陆",
+        "designer": "黄海（创意监制，竹也文化）；sheep卍（插画绘制）",
+        "headline": "一张平面讲完生死轮回，水彩一层层薄涂出壁画感",
+        "text": "《大鱼海棠》的定档海报与终极海报均由黄海与插画师sheep合作完成，黄海负责创意，sheep负责手绘。据新浪娱乐报道，黄海说构图借鉴东方壁画，因为是终极海报，希望“透过这一张平面讲述整个影片关于生死轮回的奇幻故事”。\n界面新闻提到，海报以水彩手绘，水彩干后会发灰，而商业海报需要强烈对比，于是要反复薄涂好几层。\n画面里藏着大量细节：被浪打翻的帆船、三手怪、神兽石像、土楼与廊桥，影迷曾逐一解读。",
+        "sources": [
+          {
+            "name": "新浪娱乐：《大鱼海棠》终极海报 水火交融生命轮回",
+            "url": "http://ent.sina.com.cn/m/c/2016-06-23/doc-ifxtmwei9186791.shtml"
+          },
+          {
+            "name": "界面新闻：他用一张海报把中国电影送上巅峰",
+            "url": "https://www.jiemian.com/article/1475459.html"
+          },
+          {
+            "name": "站酷：设计师黄海用12年时间把中国电影海报设计水平拉升至世界级别",
+            "url": "https://www.zcool.com.cn/article/ZODMwNzY4.html"
+          },
+          {
+            "name": "新浪博客：解读《大鱼海棠》海报",
+            "url": "https://blog.sina.com.cn/s/blog_72239ee60102y8wn.html"
+          }
+        ],
+        "tmdb": "/yKHEKsrIJLfPoS9f7m5Stbo6fpJ.jpg"
+      }
+    ]
+  },
+  "19944106": {
+    "title": "美人鱼",
+    "items": [
+      {
+        "kind": "预告海报",
+        "region": "中国大陆",
+        "designer": "周星驰（亲笔手绘）",
+        "headline": "导演亲自下场画人鱼，画得越丑越像周星驰",
+        "text": "2015年12月9日，《美人鱼》在北京召开发布会，曝光首支预告与四张海报。据界面新闻、新浪娱乐报道，其中三张是周星驰亲笔画的“美人鱼”，作为“导演手绘版海报”成为重点宣传物料。\n另一张“四海翻腾”版不见人鱼，只有毛泽东《满江红》中的诗句，这也是继《西游·降魔篇》后他又一次在海报上引用这首词。界面新闻记述，他不肯解释诗句与影片的关系，只说觉得很“牛”、很配片名。\n界面新闻形容这批海报延续了星爷“猜不透”的风格。",
+        "sources": [
+          {
+            "name": "界面新闻：你们要的《美人鱼》干货都在这",
+            "url": "https://www.jiemian.com/article/473667.html"
+          },
+          {
+            "name": "新浪娱乐：“美人鱼”亮相 周星驰邓超互称喜剧之王",
+            "url": "http://ent.sina.com.cn/m/c/2015-12-09/doc-ifxmisxu6341975.shtml"
+          },
+          {
+            "name": "游民星空：周星驰电影《美人鱼》首曝预告 星爷手绘鬼畜海报",
+            "url": "https://www.gamersky.com/news/201512/691972.shtml"
+          }
+        ],
+        "tmdb": "/wzXxTqZ2sYpDBBRnFXLfavhoW6E.jpg"
+      }
+    ]
+  },
+  "25827935": {
+    "title": "七月与安生",
+    "items": [
+      {
+        "kind": "宣传海报",
+        "region": "中国大陆",
+        "designer": "设计者未公开",
+        "headline": "三人同浴一缸，“辣眼睛”争议盖过了海报本身",
+        "text": "2016年8月，《七月与安生》发布一款三人赤身同坐浴缸的海报。据北京日报报道（人民网转载），因尺度较大、画面低俗，网友直呼“辣眼睛”，有人吐槽“把一部青春片拍出了色情片的感觉”，还有网友把男主P成导演、写上“你家也安浴缸了吗”恶搞。\n广告从业者林大罗在报道中认为，国内海报设计师往往没看过完整电影就直接设计，靠低俗噱头只会倒观众胃口。中国人民大学法学院教授刘俊海则称其“谈不上淫秽”，但海报在公交、街头随处可见，可能对未成年人产生负面影响。",
+        "sources": [
+          {
+            "name": "人民网传媒（转载北京日报）：《七月與安生》海報不安生 畫面低俗網友“辣眼睛”",
+            "url": "http://media.people.com.cn/BIG5/n1/2016/0827/c40606-28669894.html"
+          }
+        ],
+        "tmdb": "/pMVG11pLHT72nkIr3yI6IraPfB3.jpg"
+      }
+    ]
+  },
+  "26754233": {
+    "title": "八佰",
+    "items": [
+      {
+        "kind": "国际版海报",
+        "region": "中国大陆（国际版）",
+        "designer": "黄海 Huang Hai（竹也文化）",
+        "headline": "一个皮影单骑，一张1937年地图，一滴血落在上海",
+        "text": "这款国际版海报由黄海设计，选用中国传统皮影戏里的单骑武将形象，皮影幕是一张1937年的中国地图，泛黄的纸面上一抹血迹直指上海，对应淞沪会战的最后一役，也就是四行仓库保卫战。\n站酷转载的幕后文章解释了为什么用皮影：这场仗从一开始就是一场“被围观”的战役，河对岸的人看得清清楚楚，像在看一场戏。该文也提到，人物单骑挥枪，英勇之外带着悲凉孤勇。\n海报在2019年就已发布，影片后来撤档，到2020年才上映。",
+        "sources": [
+          {
+            "name": "澎湃新闻（读库）《在没有院线电影的日子，看看这些海报》",
+            "url": "https://m.thepaper.cn/newsDetail_forward_7060433"
+          },
+          {
+            "name": "新浪（2019-04-21）",
+            "url": "https://k.sina.cn/article_6176071729_1701f603101900je8u.html"
+          },
+          {
+            "name": "站酷《热血〈八佰〉！海报设计与幕后概念大揭秘》",
+            "url": "https://www.zcool.com.cn/article/ZMTE3MzEwNA==.html?lng=zh"
+          }
+        ],
+        "tmdb": "/drMA2gJ6DcaxzULsfAuJQghLa66.jpg"
+      }
+    ]
+  },
+  "30166972": {
+    "title": "少年的你",
+    "items": [
+      {
+        "kind": "正式海报（主海报）",
+        "region": "中国大陆",
+        "designer": "黄海 Huang Hai（竹也文化）",
+        "headline": "模糊的街景里，一个少年骑车冲出去",
+        "text": "《少年的你》的主海报由黄海设计。他把少年骑车的背影和周边场景都做了模糊处理，用速度感表现成长中的少年。\n片名字体是讨论最多的部分：四个字用泼墨书法写成一体，“少年”两字共用笔画，“的你”放在下方。据字由的文章，这个片名字体黄海打磨了几个月。标语“你保护世界，我保护你”放在画面里。\n澎湃号的一篇文章还提到，黄海在这组海报里用构图表现陈念和小北相依为命、一起对抗世界的主题，并用演员的眼神交代人物性格和命运。",
+        "sources": [
+          {
+            "name": "字由 hellofont",
+            "url": "https://www.hellofont.cn/article/229109"
+          },
+          {
+            "name": "澎湃号·湃客",
+            "url": "https://www.thepaper.cn/newsDetail_forward_10800963"
+          }
+        ]
+      }
+    ]
+  },
+  "26752088": {
+    "title": "我不是药神",
+    "items": [
+      {
+        "kind": "概念/宣传海报（“药神号”版）",
+        "region": "中国大陆",
+        "designer": "黄海 Huang Hai（竹也文化）",
+        "headline": "一颗胶囊做成船，载着五个人在夜海上漂",
+        "text": "2018年6月1日，片方发布“药神号”版海报。央广网的通稿写道：“治愈小队”以剪影形式站在“药神号”方舟上，胶囊形状的小船和黑色群像剪影形成反差；船在海上航行，星月照亮黑夜，带一点温暖和希望。\n澎湃号的一篇文章把这张海报算作黄海的作品，评价把贯穿全片的“药”变成一叶扁舟是“神来之笔”。数英也写明黄海是本片的海报设计师；片名字和字幕字体则是设计师尚巍的定制字体。",
+        "sources": [
+          {
+            "name": "央广网（2018-06-04）",
+            "url": "http://ent.cnr.cn/gd/20180604/t20180604_524256694.shtml"
+          },
+          {
+            "name": "澎湃号·湃客",
+            "url": "https://www.thepaper.cn/newsDetail_forward_10800963"
+          },
+          {
+            "name": "数英",
+            "url": "https://www.digitaling.com/articles/51862.html"
+          }
+        ]
+      }
+    ]
+  },
+  "27060077": {
+    "title": "绿皮书",
+    "items": [
+      {
+        "kind": "特别版海报",
+        "region": "中国大陆",
+        "designer": "黄海 Huang Hai（竹也文化）",
+        "headline": "一黑一白两只手，握着同一个方向盘",
+        "text": "第91届奥斯卡颁奖当天，《绿皮书》拿下最佳影片，官方随即发布了一张中国版海报。中国日报网写明海报由黄海设计，画面是一黑一白两只手一起操控方向盘。\n“三个设计师”的文章说这张海报用的是写实手绘插画风格，寓意患难与共；黄海还做过另一版，画面被天空和汽车分开，留白很多，用来突出人物。\n另有一张广为流传的“黑白琴键马路”海报，作者是波兰设计师 Karol Rogoz，属于粉丝自制作品，和黄海这张不是同一张。",
+        "sources": [
+          {
+            "name": "中国日报网（2019-02-25）",
+            "url": "https://ent.chinadaily.com.cn/a/201902/25/WS5c7382c9a31010568bdcbc0e.html"
+          },
+          {
+            "name": "搜狐·三个设计师（2019-03-03）",
+            "url": "https://www.sohu.com/a/298848078_285010"
+          },
+          {
+            "name": "新浪·鲜赏（Karol Rogoz 海报）",
+            "url": "https://k.sina.cn/article_5936041758_161d0cf1e01900vvqa.html"
+          }
+        ],
+        "tmdb": "/6VheS5eJ4lAAmvGu9nfN34Vrp8c.jpg"
+      }
+    ]
+  },
+  "26985127": {
+    "title": "一出好戏",
+    "items": [
+      {
+        "kind": "角色海报（艺术家手绘）",
+        "region": "中国大陆",
+        "designer": "邱炯炯 Qiu Jiongjiong（画家、导演）；另有一张手绘群像海报出自刘健 Liu Jian",
+        "headline": "把荒岛众生画成一组穿病号服的油画肖像",
+        "text": "2018年8月15日，《一出好戏》发布特别版角色海报，由当代艺术家邱炯炯创作。他也是纪录片导演，2006年以《大酒楼》开始拍片。他为六位主演各画了一张单人肖像，所有人都穿着精神病院式的蓝白条衣服，配色单一阴暗。\n8月20日，片方又发布了动画导演刘健绘制的海报，他凭《大世界》拿过金马奖最佳动画长片。画里八位主演藏在丛林中，盯着前方，是他一贯的“手工感”画风。\n一部商业喜剧接连请当代艺术家和独立动画导演画海报，在当年并不多见。",
+        "sources": [
+          {
+            "name": "光线易视（邱炯炯海报）",
+            "url": "http://m.ewang.com/n/3119.html"
+          },
+          {
+            "name": "光线易视（刘健海报）",
+            "url": "http://m.ewang.com/n/3133.html"
+          },
+          {
+            "name": "澎湃新闻（读库）",
+            "url": "https://m.thepaper.cn/newsDetail_forward_7060433"
+          }
+        ]
+      }
+    ]
+  },
+  "30176393": {
+    "title": "误杀",
+    "items": [
+      {
+        "kind": "预告海报",
+        "region": "中国大陆",
+        "designer": "洋夫 Yangfu",
+        "headline": "胶片变成断桥，黄色轿车正要坠入深渊",
+        "text": "读库作者亓冠奇在澎湃号文章里写道，《误杀》的预告海报“创意与设计来自‘洋夫’”。设计师把胶片画成桥梁，富家子弟的黄色小轿车眼看就要掉下去。\n这个意象对应主角李维杰：他靠看过的大量电影，用“剪辑”和“蒙太奇”拼出一套不在场证明。作者认为，这个画面既可以看作富家子弟的结局，也可以看作主角心理上的坠落。\n这张海报后来还出了一个更完整的版本。作者觉得原来的局部版更集中，也提到先放局部、再放整体，是2019年海报设计的一种常见做法。",
+        "sources": [
+          {
+            "name": "澎湃新闻（读库）《在没有院线电影的日子，看看这些海报》",
+            "url": "https://m.thepaper.cn/newsDetail_forward_7060433"
+          }
+        ]
+      }
+    ]
+  },
+  "26794435": {
+    "title": "哪吒之魔童降世",
+    "items": [
+      {
+        "kind": "角色海报 / 概念海报",
+        "region": "中国大陆",
+        "designer": "赵力 Zhao Li（赵力视觉 / JOHNNYSTUDIO）",
+        "headline": "在最热的夏天，给魔童再加一把火",
+        "text": "界面新闻（犀牛娱乐）报道，光线彩条屋找赵力设计《哪吒》海报时，影片很多特效和音乐还没做完，可用的素材很少，所以哪吒的姿态成了关键。赵力挑了最酷的动作，又因为“哪吒本身就是火属性”加上火焰特效。\n哪吒与龙对峙那一版更偏概念：人物画得小，靠体量对比突出冲突。文章还写到，他在炎热的暑期档大胆用暖色，“反其道而行之”。\n赵力同时设计过《战狼2》《流浪地球》的海报，界面的报道称他是“票房前三甲背后的海报设计师”。",
+        "sources": [
+          {
+            "name": "界面新闻（2019-08-31）",
+            "url": "https://www.jiemian.com/article/3462679.html"
+          }
+        ]
+      }
+    ]
+  },
+  "25907124": {
+    "title": "姜子牙",
+    "items": [
+      {
+        "kind": "终极海报",
+        "region": "中国大陆",
+        "designer": "赵力 Zhao Li（赵力视觉 / JOHNNYSTUDIO）",
+        "headline": "六个角色混战，第七个藏在画里",
+        "text": "东方网在2020年10月采访了赵力。他说，终极海报中姜子牙用法术束缚九尾狐，他给姜子牙设计了一个像拉弓的姿势，因为这在静帧里“看起来会比较帅气”。两个主角的位置定下来后，其他角色只要不破坏整体气势就行。\n他提到，动画电影在画方案稿时要在角色动作上花更多心思，多人同框的战斗场面尤其要处理好节奏和人物关系。终极海报做了两版，差别在背景的玄鸟是局部还是整体。画面上有六个角色，另外还有一个藏在其中，赵力说看过电影的观众会明白。整张海报用了一周左右。",
+        "sources": [
+          {
+            "name": "东方网专访（云南网转载，2020-10-07）",
+            "url": "https://m.yunnan.cn/system/2020/10/07/031022113.shtml"
+          }
+        ]
+      }
+    ]
+  },
+  "26925611": {
+    "title": "你想活出怎样的人生",
+    "items": [
+      {
+        "kind": "正式海报（唯一宣传海报）",
+        "region": "日本（图中为同一画面的英文版）",
+        "designer": "吉卜力工作室（绘者未公开署名）",
+        "headline": "不放预告、不发剧照，只有一张苍鹭海报",
+        "text": "2023年日本上映前，制片人铃木敏夫决定完全不做常规宣传：没有预告片、剧照、剧情简介，也不公布演员。唯一公开的就是这张在影院张贴的海报。英文维基百科和日本媒体都记载了这个“不宣传的宣传”策略。\n画面是一个披着苍鹭外形的头套，鸟嘴下面露出人的眼睛。cinema.ne.jp 转述铃木敏夫的话说，宫崎骏看到后称赞这是至今最好的一张海报。\n2024年4月在中国大陆上映时，定档海报由黄海团队设计，画面是少年真人面对三扇巨大的时空之门。",
+        "sources": [
+          {
+            "name": "Wikipedia: The Boy and the Heron",
+            "url": "https://en.wikipedia.org/wiki/The_Boy_and_the_Heron"
+          },
+          {
+            "name": "cinema.ne.jp",
+            "url": "https://cinema.ne.jp/article/detail/51734?page=1"
+          },
+          {
+            "name": "腾讯新闻（2024-03-14，中国定档海报）",
+            "url": "https://news.qq.com/rain/a/20240314A03UM700"
+          },
+          {
+            "name": "数英（各国海报合集）",
+            "url": "https://www.digitaling.com/articles/1060408.html"
+          }
+        ],
+        "tmdb": "/2M1p3PPwTV0gV2lsR1Rggby8dQw.jpg"
+      }
+    ]
+  },
+  "36712987": {
+    "title": "破·地狱",
+    "items": [
+      {
+        "kind": "国际版海报",
+        "region": "中国香港（国际版）",
+        "designer": "方序中 Joe Fang（台湾设计师）；港版正式海报与角色海报由张叔平 William Chang 设计",
+        "headline": "把破地狱的仪式，画成火光里最后一支舞",
+        "text": "星岛日报2024年11月报道，国际版海报由台湾设计师方序中设计。他挑了一张看起来像在跳舞的剧照，飞散的火星象征消逝的生命，道袍让舞蹈的姿态更明显，正好呼应英文片名 The Last Dance。他前后交过5个版本，和导演反复沟通了约4个月，最后定稿的是这张红色火焰版。慈善首映礼的戏票用的也是这张图。\n方序中当过金马奖视觉统筹，7度入围金曲奖最佳装帧设计，还凭《老狐狸》海报拿过第26届台北电影奖最佳海报。\n片中的正式海报和角色海报由美术指导张叔平亲自设计，2024年10月底在海港城做过海报剧照展。",
+        "sources": [
+          {
+            "name": "星岛日报（2024-11-04）",
+            "url": "https://www.stheadline.com/realtime/article/2033455/%E5%8D%B3%E6%99%82-%E5%A8%9B%E6%A8%82-%E7%A0%B4-%E5%9C%B0%E7%8D%84-%E5%9C%8B%E9%9A%9B%E7%89%88%E6%B5%B7%E5%A0%B1%E5%B8%AB%E8%83%8C%E6%99%AF%E8%B6%85%E5%8B%81-%E6%96%B9%E5%BA%8F%E4%B8%AD%E7%88%B6%E8%A6%AA%E6%9B%BE%E5%BE%9E%E4%BA%8B%E6%AE%AF%E8%91%AC%E6%A5%AD%E6%9B%B4%E7%8F%8D%E6%83%9C%E7%94%9F%E5%91%BD%E4%B8%A8%E7%8D%A8%E5%AE%B6"
+          },
+          {
+            "name": "Timable 海报剧照展",
+            "url": "https://timable.com/hk/cn/event/6710db03f36cad964445027f/"
+          }
+        ],
+        "tmdb": "/x4UT6SsBEnVzyeYm86WItNl4wGG.jpg"
+      }
+    ]
+  },
+  "37116612": {
+    "title": "世界的主人",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "韩国",
+        "designer": "박시영 Park Si-young（工作室 빛나는 Bitnaneun）",
+        "headline": "一个女孩被一百个自己围住，花和苹果冻在冰里",
+        "text": "尹佳恩导演在Indiespace映后谈中说，这张海报她“一点意见都没提”，完全是工作室빛나는的박시영的作品。据她了解，设计师一直在想怎么表现主人这个孩子的多面性，所以把她放在中间，用许多个主人围住她，说明这些身份都属于同一个女孩。\n导演拿到海报时注意到，盛开的花和苹果都被冻成了冰。设计师的解释是：现在也许冻得结结实实，等春天来了冰会融化，迎来另一个春天，所以画里还有没开的花苞。\n海报公开后在网上反响很大。2025年10月31日，박시영和导演在CGV龙山专门办了一场海报幕后对谈。",
+        "sources": [
+          {
+            "name": "Indiespace 映后谈记录",
+            "url": "https://indiespace.kr/491283"
+          },
+          {
+            "name": "Daum新闻（2025-10-28）",
+            "url": "https://v.daum.net/v/20251028174803156"
+          }
+        ],
+        "tmdb": "/8lQDCvbshgvwou3Gf9AasFfTbxu.jpg"
+      }
+    ]
+  },
+  "36154853": {
+    "title": "好东西",
+    "items": [
+      {
+        "kind": "正式海报",
+        "region": "中国大陆",
+        "designer": "设计者未公开（导演邵艺辉提到出自一位男性设计师）",
+        "headline": "三个女人分别扮成金斯伯格、弗里达和梵高",
+        "text": "这张海报里，王铁梅、小叶、王茉莉三个角色分别扮成倡导性别平等的大法官金斯伯格、墨西哥画家弗里达和荷兰画家梵高。\n邵艺辉在澎湃的采访中说，现在女性海报设计师特别少，这张“还是出自一位男性设计师的手笔”。画面其实是片中一闪而过的蒙太奇片段，和剧情关系不大，但“有明确的女性向内涵，懂的都懂”，不了解这些人物背景的观众也会觉得欢乐。新华网则把这些装扮看作需要观众自己解密的“加密信息”。",
+        "sources": [
+          {
+            "name": "澎湃新闻 邵艺辉专访",
+            "url": "https://m.thepaper.cn/newsDetail_forward_29342020"
+          },
+          {
+            "name": "新华网",
+            "url": "http://www.news.cn/ent/20241203/25e70b8e7c88475793aa2d9448647401/c.html"
+          }
+        ],
+        "tmdb": "/rGjS5HSPqXlGFedp9p9eukdlqx5.jpg"
+      }
+    ]
+  },
+  "10604086": {
+    "title": "封神第一部：朝歌风云",
+    "items": [
+      {
+        "kind": "概念海报",
+        "region": "中国大陆",
+        "designer": "徐天华 Xu Tianhua（设计师、画家）",
+        "headline": "把封神之战画进一张翻涌的太极图",
+        "text": "数英整理《封神第一部》宣发海报时写到，概念海报由设计师兼画家徐天华设计，主题是“阴阳之战”。他以太极为原型，画出翻涌的真气，营造上古宇宙的氛围，另外还做了动态版。\n同一轮宣发里还有李云中的手绘版海报，用线条和水彩画出中国风，让人联想到小时候看的小人书；上海美术电影制片厂也画了一张2D风格的联动海报，庆祝上海首映。",
+        "sources": [
+          {
+            "name": "数英",
+            "url": "https://www.digitaling.com/articles/954799.html"
+          }
+        ],
+        "tmdb": "/slic4lSUqPWArK4H8DHmvNRMSQq.jpg"
+      }
+    ]
+  },
+  "26374197": {
+    "title": "蜘蛛侠：平行宇宙",
+    "items": [
+      {
+        "kind": "艺术海报（Mondo 限量版）",
+        "region": "美国",
+        "designer": "Martin Ansin（Mondo 签约艺术家）",
+        "headline": "Mondo 用一张丝网印刷海报庆祝它拿下土星奖",
+        "text": "2019年9月，为庆祝本片获得土星奖最佳动画电影，收藏海报厂牌 Mondo 推出艺术家 Martin Ansin 创作的限量丝网印刷海报。\nCBR报道：海报尺寸36×24英寸，每张手工编号，售价60美元，每人或每户限购一张，9月18日截止订购。画面中迈尔斯像要从纸面上扑出来，各个平行宇宙的蜘蛛侠围在旁边，金并在后方压阵。",
+        "sources": [
+          {
+            "name": "CBR（2019-09-15）",
+            "url": "https://www.cbr.com/spider-man-into-the-spider-verse-mondo-limited-edition-screenprinted-poster/"
           }
         ]
       }

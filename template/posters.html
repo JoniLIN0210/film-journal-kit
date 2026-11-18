@@ -2,93 +2,176 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{me} 的海报馆</title>
-<meta name="description" content="看过的每一部影视，它们在不同国家、不同时期的海报。">
+<meta name="description" content="看过的每一部影视，它们在世界各地的海报。">
 <link rel="stylesheet" href="assets/style.css">
+<style>
+  /* 海报馆 — a dark, full-screen viewing room. One film at a time, the poster as large as the screen allows. */
+  html, body.px { height: 100%; overflow: hidden; background: #050506; }
+  .px { --ink: #f4f1ea; --dim: rgba(244, 241, 234, .58); --faint: rgba(244, 241, 234, .16); color: var(--ink); }
+  .px button { background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }
+  .px a { color: inherit; }
+
+  .px-bg { position: fixed; inset: -8%; z-index: 0; }
+  .px-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(70px) saturate(1.25) brightness(.55); transform: scale(1.1); opacity: 0; transition: opacity 1.2s ease; }
+  .px-bg img.on { opacity: 1; }
+  .px-bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 62% 45%, rgba(5, 5, 6, .05), rgba(5, 5, 6, .78) 72%), linear-gradient(90deg, rgba(5, 5, 6, .7), rgba(5, 5, 6, 0) 46%); }
+  .px-grain { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  .px-room { position: fixed; inset: 0; z-index: 2; display: grid; grid-template-columns: minmax(300px, 34%) 1fr; grid-template-rows: auto 1fr auto; padding: 0 clamp(20px, 3vw, 48px); }
+  .px-top { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 0 10px; }
+  .px-brand { font-family: var(--cn); font-weight: 900; font-size: 18px; letter-spacing: .08em; text-decoration: none; }
+  .px-brand i { font-family: var(--display); font-weight: 400; margin-left: 10px; letter-spacing: 0; color: var(--lime); }
+  .px-brand .me { font-family: var(--sans); font-weight: 400; margin-right: 6px; }
+  .px-tools { display: flex; align-items: center; gap: 8px; }
+  .px-tools > * { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; border: 1px solid var(--faint) !important; border-radius: 999px; padding: 8px 14px !important; text-decoration: none; transition: background .2s, color .2s, border-color .2s; }
+  .px-tools > *:hover, .px-tools > [aria-pressed=true] { background: var(--lime) !important; color: var(--black); border-color: var(--lime) !important; }
+
+  .px-info { align-self: center; padding-right: clamp(16px, 3vw, 48px); max-height: 100%; overflow: auto; scrollbar-width: none; }
+  .px-info::-webkit-scrollbar { display: none; }
+  .px-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
+  .px-kicker b { color: var(--lime); font-weight: 400; }
+  .px-title { font-family: var(--cn); font-weight: 900; font-size: clamp(36px, 4.4vw, 76px); line-height: 1.04; letter-spacing: -.01em; margin: 14px 0 8px; text-wrap: balance; }
+  .px-orig { font-family: var(--display); font-style: italic; font-size: clamp(18px, 1.7vw, 26px); color: var(--dim); line-height: 1.25; }
+  .px-meta { margin-top: 18px; font-size: 14px; color: var(--dim); }
+  .px-meta .stars { color: var(--lime); font-size: 13px; letter-spacing: 3px; margin-left: 6px; }
+  .px-quote { margin: 22px 0 0; padding-left: 16px; border-left: 2px solid var(--lime); font-family: var(--cn); font-size: 15px; line-height: 1.8; color: rgba(244, 241, 234, .86); max-width: 440px; }
+  .px-quote small { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .14em; color: var(--dim); margin-top: 6px; }
+  .px-version { margin-top: 30px; display: flex; align-items: baseline; gap: 14px; }
+  .px-version .n { font-family: var(--display); font-size: clamp(54px, 5.4vw, 92px); line-height: .85; }
+  .px-version .n small { font-size: .38em; color: var(--dim); margin-left: 4px; }
+  .px-version .l { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; line-height: 1.7; }
+  .px-version .l b { color: var(--ink); font-weight: 400; }
+  .px-note-btn { margin-top: 22px; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--black) !important; background: var(--lime) !important; padding: 9px 14px !important; border-radius: 999px; }
+  .px-note { margin-top: 12px; font-size: 14px; line-height: 1.85; color: rgba(244, 241, 234, .86); max-width: 460px; }
+  .px-note .h { font-family: var(--cn); font-weight: 700; font-size: 17px; color: var(--ink); margin-bottom: 8px; }
+  .px-note .by { font-family: var(--display); font-style: italic; font-size: 19px; color: var(--lime); margin-bottom: 8px; }
+  .px-note .which { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; color: var(--dim); margin-bottom: 10px; }
+  .px-note p { margin: 0 0 10px; }
+  .px-note .src { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+  .px-note .src a { margin-right: 10px; }
+  .px-films { margin-top: 28px; display: flex; gap: 8px; }
+  .px-films button { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--dim); border: 1px solid var(--faint) !important; border-radius: 999px; padding: 8px 14px !important; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .px-films button:hover { color: var(--ink); border-color: var(--ink) !important; }
+
+  .px-stage { position: relative; display: flex; align-items: center; justify-content: center; min-height: 0; }
+  .px-frame { position: relative; height: calc(100vh - 196px); height: calc(100dvh - 196px); aspect-ratio: var(--ar, .667); max-width: calc(100% - 130px); }
+  .px-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transform: scale(.985); transition: opacity .7s ease, transform 1.1s cubic-bezier(.2, .7, .2, 1); box-shadow: 0 40px 120px rgba(0, 0, 0, .65), 0 0 0 1px rgba(255, 255, 255, .04); }
+  .px-frame img.on { opacity: 1; transform: scale(1); }
+  .playing .px-frame img.on { animation: drift 7s ease-out forwards; }
+  @keyframes drift { from { transform: scale(1); } to { transform: scale(1.035); } }
+  .px-frame .loading[hidden] { display: none; }
+  .px-frame .loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--dim); }
+  .px-badge { position: absolute; left: 0; top: 0; z-index: 2; transform: translate(-10px, -10px); background: var(--lime); color: var(--black); font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; padding: 7px 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45); max-width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .px-badge b { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 13px; letter-spacing: 0; text-transform: none; margin-left: 6px; }
+  .px-note-wrap { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--faint); }
+  .px-note-wrap .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; color: var(--lime); text-transform: uppercase; display: flex; justify-content: space-between; gap: 10px; }
+  .px-note-wrap .lbl button { color: var(--dim); font: inherit; letter-spacing: inherit; }
+  .px-strip button.noted { position: relative; }
+  .px-strip button.noted::after { content: ""; position: absolute; right: 4px; top: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 2px rgba(5, 5, 6, .7); }
+  .px-card .tag { position: absolute; left: 6px; top: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; background: var(--lime); color: var(--black); padding: 3px 7px; }
+  .px-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; border-radius: 50% !important; border: 1px solid var(--faint) !important; font-size: 18px; color: var(--ink); opacity: .7; transition: opacity .2s, background .2s, color .2s; z-index: 3; }
+  .px-arrow:hover { opacity: 1; background: var(--lime) !important; color: var(--black); border-color: var(--lime) !important; }
+  .px-arrow.prev { left: 0; } .px-arrow.next { right: 0; }
+
+  .px-bottom { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(300px, 34%) 1fr; align-items: end; gap: 0; padding: 12px 0 20px; }
+  .px-hint { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; color: var(--dim); line-height: 1.9; }
+  .px-hint kbd { font: inherit; border: 1px solid var(--faint); border-radius: 3px; padding: 0 5px; color: var(--ink); }
+  .px-strip { display: flex; gap: 8px; justify-content: center; overflow-x: auto; scrollbar-width: none; padding: 4px; }
+  .px-strip::-webkit-scrollbar { display: none; }
+  .px-strip button { flex: none; height: 64px; aspect-ratio: .667; overflow: hidden; opacity: .4; outline: 1px solid transparent; outline-offset: 3px; transition: opacity .2s, outline-color .2s; }
+  .px-strip button img { width: 100%; height: 100%; object-fit: cover; }
+  .px-strip button:hover { opacity: .85; }
+  .px-strip button[aria-current=true] { opacity: 1; outline-color: var(--lime); }
+  .px-credit { position: fixed; right: clamp(20px, 3vw, 48px); bottom: 6px; z-index: 3; font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: rgba(244, 241, 234, .32); }
+
+  /* index: every film, one poster each */
+  .px-index { position: fixed; inset: 0; z-index: 10; background: rgba(5, 5, 6, .97); overflow-y: auto; padding: 0 clamp(20px, 3vw, 48px) 80px; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .px-index.open { opacity: 1; pointer-events: auto; }
+  .px-index-head { position: sticky; top: 0; z-index: 2; background: #050506; padding: 22px 0 22px; margin-bottom: 28px; }
+  .px-index-head::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 28px; background: linear-gradient(#050506, rgba(5, 5, 6, 0)); pointer-events: none; }
+  .px-index-head .row1 { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+  .px-index h2 { font-family: var(--cn); font-weight: 900; font-size: clamp(44px, 7vw, 110px); line-height: 1; margin: 26px 0 6px; letter-spacing: -.02em; }
+  .px-index h2 i { font-family: var(--display); font-weight: 400; font-size: .4em; color: var(--lime); margin-left: .3em; }
+  .px-index .sub { color: var(--dim); font-size: 14px; }
+  .px-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 22px; }
+  .px-filters .chip { --line: var(--faint); --fg: var(--ink); --bg: #050506; color: var(--ink); }
+  .px-filters .chip[aria-pressed=true] { background: var(--lime); border-color: var(--lime); color: var(--black); }
+  .px-filters select { background: transparent; color: var(--ink); border: 1px solid var(--faint); border-radius: 999px; height: 34px; padding: 0 14px; font-size: 13px; }
+  .px-filters select option { color: #0b0b0c; }
+  .px-filters .sep { width: 1px; height: 22px; background: var(--faint); margin: 0 4px; }
+  .px-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 34px 18px; }
+  .px-card { text-align: left; }
+  .px-card .img { position: relative; aspect-ratio: .667; overflow: hidden; background: #111; }
+  .px-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .2, 1), filter .3s; filter: saturate(.9); }
+  .px-card:hover img { transform: scale(1.05); filter: saturate(1.1); }
+  .px-card .k { position: absolute; right: 6px; bottom: 6px; font-family: var(--mono); font-size: 10px; background: rgba(5, 5, 6, .75); padding: 3px 7px; letter-spacing: .08em; }
+  .px-card .t { font-family: var(--cn); font-weight: 900; font-size: 15px; line-height: 1.35; margin-top: 10px; }
+  .px-card .m { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--dim); margin-top: 3px; }
+  .px-card .m .s { color: var(--lime); }
+
+  @media (max-width: 860px) {
+    html, body.px { overflow: auto; }
+    .px-room { position: relative; inset: auto; min-height: 100%; grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; padding: 0 18px; }
+    .px-top { flex-wrap: wrap; }
+    .px-tools > * { padding: 7px 11px !important; }
+    .px-stage { order: 2; height: 66vh; }
+    .px-frame { height: 100%; max-width: 100%; }
+    .px-arrow { display: none; }
+    .px-info { order: 3; padding: 22px 0 0; overflow: visible; max-height: none; }
+    .px-bottom { order: 4; grid-template-columns: 1fr; }
+    .px-hint { display: none; }
+    .px-strip { justify-content: flex-start; padding: 18px 2px 28px; }
+    .px-credit { position: static; display: block; padding: 0 18px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .px-bg img, .px-frame img { transition: none; }
+    .playing .px-frame img.on { animation: none; }
+  }
+</style>
 </head>
-<body class="pa">
-<header class="block hero pa-hero t-black">
-  <div class="wrap">
-    <div class="bar">
-      <a class="brand" href="index.html"><span class="me" data-me></span>的观影志<i>Film Journal</i></a>
-      <nav class="mono">
-        <a href="#notes" id="nav-notes">赏析</a><a href="#icons">最受关注</a><a href="#versions">各国版本</a><a href="#alt">另类</a><a href="#wall">海报墙</a>
-        <a class="pill" href="index.html">← 主页</a>
-        <a class="pill solid" href="report.html"><span data-ry></span> 年度报告</a>
-      </nav>
+<body class="px">
+<div class="px-bg" aria-hidden="true"><img alt=""><img alt=""></div>
+<div class="px-grain" aria-hidden="true"></div>
+
+<div class="px-room" id="room">
+  <header class="px-top">
+    <a class="px-brand" href="index.html"><span class="me" data-me></span>的海报馆<i>Poster Room</i></a>
+    <div class="px-tools">
+      <button data-act="index">索引 · Index</button>
+      <button data-act="play" aria-pressed="false">▶ 播放</button>
+      <button data-act="tour" aria-pressed="false">名作导览</button>
+      <button data-act="shuffle">随机</button>
+      <a href="index.html">主页</a>
     </div>
+  </header>
+
+  <section class="px-info" id="info" aria-live="polite"></section>
+
+  <section class="px-stage" id="stage">
+    <button class="px-arrow prev" data-step="-1" aria-label="上一张">←</button>
+    <div class="px-frame" id="frame"><div class="loading">Loading</div><img alt=""><img alt=""><div class="px-badge" id="badge" hidden></div></div>
+    <button class="px-arrow next" data-step="1" aria-label="下一张">→</button>
+  </section>
+
+  <footer class="px-bottom">
+    <div class="px-hint"><kbd>←</kbd> <kbd>→</kbd> 同一部的不同版本　<kbd>↑</kbd> <kbd>↓</kbd> 换一部<br><kbd>空格</kbd> 自动播放　<kbd>I</kbd> 索引　<kbd>F</kbd> 全屏</div>
+    <div class="px-strip" id="strip"></div>
+  </footer>
+</div>
+<div class="px-credit" id="credit"></div>
+
+<section class="px-index" id="index" aria-label="海报索引">
+  <div class="px-index-head">
+    <div class="row1"><a class="px-brand" href="index.html"><span class="me" data-me></span>的海报馆<i>Index</i></a><div class="px-tools"><button data-act="close">× 回到放映</button></div></div>
+    <h2>索引<i>every film, every face</i></h2>
+    <div class="sub" id="index-sub"></div>
+    <div class="px-filters" id="filters"></div>
   </div>
-  <div class="wrap stage">
-    <div class="mono" id="pa-vol" style="margin-bottom:18px"></div>
-    <h1>海报馆</h1>
-    <div class="script">The Poster Archive</div>
-    <div class="intro">
-      <p id="pa-intro"></p>
-      <div class="mono" id="pa-asof"></div>
-    </div>
-  </div>
-  <div class="pa-strip" aria-hidden="true"><div class="track" id="pa-strip"></div></div>
-</header>
-
-<main>
-  <section class="t-lime" id="notes">
-    <div class="wrap">
-      <div class="head"><div class="idx mono">00 — Appreciation</div><h2>名作赏析<i>posters worth a closer look</i></h2><p id="notes-p"></p></div>
-      <div id="notes-list"></div>
-    </div>
-  </section>
-
-  <section class="t-black" id="icons">
-    <div class="wrap">
-      <div class="head"><div class="idx mono">01 — Icons</div><h2>最受关注<i>the most talked-about</i></h2><p id="icons-p"></p></div>
-      <div class="pa-icons" id="icons-grid"></div>
-    </div>
-  </section>
-
-  <section class="t-white" id="versions">
-    <div class="wrap">
-      <div class="head"><div class="idx mono">02 — Versions</div><h2>一部电影，几个国家<i>one film, many faces</i></h2><p id="versions-p"></p></div>
-      <div class="pa-versions" id="versions-list"></div>
-      <div class="pa-regions" id="regions"></div>
-    </div>
-  </section>
-
-  <section class="t-blue" id="alt">
-    <div class="wrap">
-      <div class="head"><div class="idx mono">03 — Alternative</div><h2>另类与艺术<i>beyond the one-sheet</i></h2><p id="alt-p"></p></div>
-      <div class="pa-tiles" id="alt-grid"></div>
-    </div>
-  </section>
-
-  <section class="t-black" id="wall">
-    <div class="wrap">
-      <div class="head"><div class="idx mono">04 — The Wall</div><h2>海报墙<i>every poster</i></h2><p id="wall-p"></p></div>
-      <div class="controls pa-controls">
-        <div class="row" id="chips-year"></div>
-        <div class="row">
-          <span id="chips-kind" class="row"></span>
-          <span class="sep"></span>
-          <select id="f-region" aria-label="地区版本"></select>
-          <select id="f-view" aria-label="排列">
-            <option value="film">按影片</option><option value="tile">全部平铺</option>
-          </select>
-        </div>
-      </div>
-      <div id="wall-body"></div>
-      <button class="more" id="more" hidden>LOAD MORE　继续</button>
-    </div>
-  </section>
-</main>
-
-<dialog class="pa-box" id="box" aria-label="海报大图">
-  <button class="close" data-x aria-label="关闭">×</button>
-  <button class="nav prev" data-step="-1" aria-label="上一张">←</button>
-  <button class="nav next" data-step="1" aria-label="下一张">→</button>
-  <figure><img id="box-img" alt=""><figcaption id="box-cap"></figcaption></figure>
-</dialog>
-
-<footer class="t-black"><div class="wrap mono"><span>Curated by <a id="me-link" target="_blank" rel="noopener" data-me></a> — The Poster Archive</span><span id="credits">海报来自豆瓣，版权归各片方与设计师所有 · 仅供个人收藏</span></div></footer>
+  <div class="px-grid" id="grid"></div>
+</section>
 
 <script>/* always load the freshest data after an update */ document.write('<script src="data/movies.js?v=' + Date.now() + '"><\/script><script src="data/posters.js?v=' + Date.now() + '"><\/script>');</script>
 <script>/* opened without its data — almost always because the page was double-clicked inside the zip */
@@ -101,157 +184,191 @@ if (!window.MOVIES) document.body.innerHTML = '<div style="max-width:560px;margi
 </script>
 <script src="assets/common.js"></script>
 <script>
-const P = window.POSTERS || {}, CUR = window.CURATION || {};
-const byId = Object.fromEntries(M.map((m) => [m.id, m]));
-/* one flat list; each poster knows its film and its rank inside that film (0 = most liked on Douban) */
-const ALL = [];
-const films = M.filter((m) => P[m.id] && P[m.id].length).sort(byDateDesc);
-films.forEach((m) => P[m.id].forEach((p, i) => ALL.push({ ...p, m, rank: i })));
-const years = [...new Set(films.map((m) => m.date.slice(0, 4)).filter(Boolean))].sort().reverse();
-const RY = years[0] || '';
-document.querySelectorAll('[data-ry]').forEach((el) => { el.textContent = RY; });
-$('#me-link').href = PROFILE.url || '#';
+const P = window.POSTERS || {}, NOTES = window.CURATION || {};   // P[doubanId] = [{s:'d'|'t', id, f:file, w, h, k, g, lang, v, note}]
+// notes pinned to one exact poster (a TMDB path or a Douban photo id that made it into the zip) vs. notes about a film's posters in general
+const NOTE_AT = {}, FILM_NOTE = {};
+Object.entries(NOTES).forEach(([fid, n]) => (n.items || []).forEach((it) => {
+  const hit = (P[fid] || []).find((q) => (it.tmdb && q.s === 't' && q.id === it.tmdb.replace(/^\/|\.\w+$/g, '')) || (it.photo && q.s === 'd' && q.id === it.photo));
+  if (hit) NOTE_AT[fid + ':' + hit.s + hit.id] = it; else if (!FILM_NOTE[fid]) FILM_NOTE[fid] = it;
+}));
+const noteAt = (m, q) => q && NOTE_AT[m.id + ':' + q.s + q.id];
+const hasNote = (m) => !!(NOTES[m.id] && (NOTES[m.id].items || []).length);
+const firstNoted = (m) => Math.max(0, posters(m).findIndex((q) => noteAt(m, q)));
+const label = (q) => q.s === 't' ? (q.lang || [q.g, q.k].filter(Boolean).join(' ') || 'TMDB') : ([q.g, q.k].filter(Boolean).join(' ') || '海报');
+const sub = (q) => q.s === 't' ? 'TMDB' + (q.v ? ` ★ ${q.v}` : '') : '豆瓣' + (q.note ? ' · ' + q.note : '');
+const ALL = M.filter((m) => P[m.id] && P[m.id].length).sort(byDateDesc);
+const total = ALL.reduce((n, m) => n + P[m.id].length, 0);
+const fromTmdb = ALL.some((m) => P[m.id].some((q) => q.s === 't'));
+$('#credit').textContent = '海报来自豆瓣' + (fromTmdb ? ' 与 TMDB · This product uses the TMDB API but is not endorsed or certified by TMDB.' : '');
+const years = [...new Set(ALL.map((m) => m.date.slice(0, 4)).filter(Boolean))].sort().reverse();
 
-const imgHTML = (p, cls = '') => `<button class="pa-p ${cls}" data-pid="${esc(p.id)}" style="aspect-ratio:${p.w && p.h ? Math.min(0.85, Math.max(0.55, p.w / p.h)).toFixed(3) : '0.68'}"><img loading="lazy" src="${esc(p.f)}" alt="《${esc(p.m.t)}》${esc(p.k || '海报')}"></button>`;
-const isAlt = (p) => p.k === '其他海报' || p.lang === '无字版';
-const capText = (p) => (p.s === 't' ? ['TMDB', p.lang, p.v ? `★ ${p.v}` : ''] : [p.k === '其他海报' ? '艺术与同人' : p.k, p.g, p.note]).filter(Boolean).join(' · ') || '海报';
-const srcLink = (p) => p.s === 't' ? `https://www.themoviedb.org/${p.tm}/images/posters` : `https://movie.douban.com/photos/photo/${p.id}/`;
-const regions = (() => { const t = {}; ALL.forEach((p) => { if (p.g) t[p.g] = (t[p.g] || 0) + 1; }); return Object.entries(t).sort((a, b) => b[1] - a[1]); })();
-if (PROFILE.tmdb) $('#credits').innerHTML = '海报来自豆瓣与 TMDB，版权归各片方与设计师所有 · 仅供个人收藏 · This product uses the TMDB API but is not endorsed or certified by TMDB.';
+let list = ALL.slice(), fi = 0, vi = 0, playing = false, timer = null, layer = 0, noteOpen = null, shownPath = '', seq = 0;
+const state = { year: '', five: false, noted: false, sort: 'date' };
+const room = $('#room'), frame = $('#frame'), idx = $('#index');
+const posters = (m) => P[m.id];
 
-if (!ALL.length) {
-  $('#pa-intro').textContent = '这一份观影志还没有收集海报。重新点一次收藏栏里的按钮，选择“观影志 + 海报馆”即可生成。';
-  ['#notes', '#icons', '#versions', '#alt', '#wall'].forEach((s) => { $(s).hidden = true; });
-} else {
-  /* hero */
-  $('#pa-vol').textContent = `Vol. ${years[years.length - 1]} — ${years[0]}　/　${ME} 的海报收藏`;
-  $('#pa-intro').innerHTML = `从 <b>${films.length}</b> 部看过的影视里，收集了 <b>${ALL.length}</b> 张海报，来自 <b>${regions.length}</b> 个国家和地区的版本。每部按豆瓣用户的喜欢排序，留下最受欢迎的几张。`;
-  $('#pa-asof').textContent = `Updated ${(PROFILE.updated || '').replace(/-/g, '.')}`;
-  const strip = films.slice(0, 16).map((m) => ALL.find((p) => p.m === m)).filter(Boolean);
-  $('#pa-strip').innerHTML = [...strip, ...strip].map((p) => `<img src="${esc(p.f)}" alt="">`).join('');
-
-  /* 00 appreciation: curated notes on famous posters among the films this person has seen */
-  const curFilms = films.filter((m) => CUR[m.id] && (CUR[m.id].items || []).length);
-  if (curFilms.length) {
-    $('#notes-p').textContent = `你看过的影视里，有 ${curFilms.length} 部的海报在设计史上留下了名字。`;
-    $('#notes-list').innerHTML = curFilms.map((m, i) => CUR[m.id].items.map((it) => {
-      const p = ALL.find((x) => x.m === m && x.s === 'd' && x.id === it.photo) || ALL.find((x) => x.m === m);
-      return `<article class="pa-note${i % 2 ? ' flip' : ''}">
-        <div class="pa-note-img">${p ? imgHTML(p) : ''}</div>
-        <div class="pa-note-body">
-          <div class="mono">${esc([m.y, it.kind || '', it.region || ''].filter(Boolean).join('　·　'))}</div>
-          <h3>${esc(m.t)}</h3>
-          ${it.headline ? `<p class="lede">${esc(it.headline)}</p>` : ''}
-          ${it.designer ? `<div class="by"><span class="label">Design</span>${esc(it.designer)}</div>` : ''}
-          ${(it.text || '').split('\n').filter(Boolean).map((t) => `<p>${esc(t)}</p>`).join('')}
-          ${(it.sources || []).length ? `<div class="src mono">参考：${it.sources.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>`).join('　')}</div>` : ''}
-        </div></article>`;
-    }).join('')).join('');
-  } else { $('#notes').hidden = true; $('#nav-notes').hidden = true; }
-
-  /* 01 icons: most discussed posters overall (Douban reply count), one per film */
-  const seen = new Set();
-  const icons = ALL.slice().sort((a, b) => (b.c || 0) - (a.c || 0)).filter((p) => !seen.has(p.m.id) && seen.add(p.m.id)).slice(0, 9);
-  $('#icons-p').textContent = '你看过的影视里，在豆瓣上被讨论最多的海报，每部选一张。';
-  $('#icons-grid').innerHTML = icons.map((p, i) => `<figure class="pa-icon${i === 0 ? ' lead' : ''}">${imgHTML(p)}
-    <figcaption><span class="n">${String(i + 1).padStart(2, '0')}</span><b>${esc(p.m.t)}</b><span class="mono">${esc(capText(p))}${p.c ? ` · ${p.c} 条回应` : ''}</span></figcaption></figure>`).join('');
-
-  /* 02 versions: films whose posters come from the most different regions */
-  const multi = films.map((m) => {
-    const byRegion = {};
-    P[m.id].forEach((p) => { const g = p.g || ''; if (g && !byRegion[g]) byRegion[g] = ALL.find((x) => x.id === p.id && x.m === m); });
-    return { m, list: Object.values(byRegion) };
-  }).filter((x) => x.list.length >= 3).sort((a, b) => b.list.length - a.list.length || (b.m.r || 0) - (a.m.r || 0)).slice(0, 6);
-  if (multi.length) {
-    $('#versions-p').textContent = '同一部电影在不同国家上映时，常常换一张完全不同的脸。这些是你看过的影视里，地区版本最多的几部。';
-    $('#versions-list').innerHTML = multi.map(({ m, list }) => `<div class="pa-ver">
-      <div class="pa-ver-h"><h3>${esc(m.t)}</h3><div class="mono">${[m.y, (m.d || []).slice(0, 2).join(' / ')].filter(Boolean).map(esc).join('　·　')}${m.r ? `　·　<span class="stars">${stars(m.r)}</span>` : ''}</div><div class="pa-ver-n">${list.length}<small>个版本</small></div></div>
-      <div class="pa-ver-row">${list.slice(0, 6).map((p) => `<figure>${imgHTML(p)}<figcaption class="mono">${esc(p.g)}</figcaption></figure>`).join('')}</div></div>`).join('');
-  } else { $('#versions-p').textContent = '海报的地区版本还不够多，暂时没有可以并排比较的影片。'; }
-  $('#regions').innerHTML = `<div class="label">版本地图 — 海报来自哪里</div><div class="pa-reg">${regions.slice(0, 16).map(([g, n]) => `<button class="chip" data-region="${esc(g)}">${esc(g)}<b>${n}</b></button>`).join('')}</div>`;
-  $('#regions').addEventListener('click', (e) => { const c = e.target.closest('[data-region]'); if (c) { state.region = c.dataset.region; $('#f-region').value = state.region; state.year = ''; render(true); $('#wall').scrollIntoView(); } });
-
-  /* 03 alternative: fan-made / artistic designs and textless versions */
-  const alts = ALL.filter(isAlt);
-  if (alts.length) {
-    $('#alt-p').textContent = `不是每张海报都出自片方：豆瓣用户和设计师的再创作，以及去掉文字后的原画，共 ${alts.length} 张。`;
-    $('#alt-grid').innerHTML = alts.slice(0, 60).map((p) => `<figure class="pa-alt">${imgHTML(p)}<figcaption class="mono">${esc(p.m.t)}　·　${esc(capText(p))}</figcaption></figure>`).join('');
-  } else { $('#alt').hidden = true; }
-
-  /* 04 the wall */
-  const state = { year: '', kind: '', region: '', view: 'film', shown: 0 };
-  const PAGE_FILMS = 18, PAGE_TILES = 90;
-  $('#f-region').innerHTML = '<option value="">全部地区版本</option>' + regions.map(([g, n]) => `<option value="${esc(g)}">${esc(g)}版　${n}</option>`).join('');
-  const kinds = [['', '全部'], ['five', '五星'], ['正式海报', '正式海报'], ['预告海报', '预告海报'], ['其他海报', '艺术与同人'], ['tmdb', 'TMDB'], ['textless', '无字版']]
-    .filter(([v]) => !v || v === 'five' || ALL.some((p) => (v === 'tmdb' ? p.s === 't' : v === 'textless' ? p.lang === '无字版' : p.k === v)));
-  const chips = () => {
-    $('#chips-year').innerHTML = [['', '全部年份'], ...years.map((y) => [y, y])].map(([v, l]) => `<button class="chip" data-year="${v}" aria-pressed="${state.year === v}">${l}</button>`).join('');
-    $('#chips-kind').innerHTML = kinds.map(([v, l]) => `<button class="chip" data-kind="${v}" aria-pressed="${state.kind === v}">${l}</button>`).join('');
-  };
-  const match = (p) => (!state.year || p.m.date.startsWith(state.year)) && (!state.region || p.g === state.region)
-    && (!state.kind || (state.kind === 'five' ? p.m.r === 5 : state.kind === 'tmdb' ? p.s === 't' : state.kind === 'textless' ? p.lang === '无字版' : p.k === state.kind));
-  function render(reset) {
-    if (reset) state.shown = 0;
-    chips();
-    const list = ALL.filter(match);
-    const nFilms = new Set(list.map((p) => p.m.id)).size;
-    $('#wall-p').textContent = `${nFilms} 部影视 · ${list.length} 张海报`;
-    let html = '', more = false;
-    if (state.view === 'tile') {
-      state.shown += PAGE_TILES;
-      html = `<div class="pa-tiles">${list.slice(0, state.shown).map((p) => imgHTML(p)).join('')}</div>`;
-      more = list.length > state.shown;
-    } else {
-      const fl = films.filter((m) => list.some((p) => p.m === m));
-      state.shown += PAGE_FILMS;
-      html = fl.slice(0, state.shown).map((m) => {
-        const ps = list.filter((p) => p.m === m);
-        return `<div class="pa-film"><div class="pa-film-h" data-film="${esc(m.id)}"><span class="mono">${esc(m.date.replace(/-/g, '.'))}</span><h3>${esc(m.t)}</h3><div class="mono">${[m.y, (m.c || [])[0]].filter(Boolean).map(esc).join(' · ')}${m.r ? ` <span class="stars">${stars(m.r)}</span>` : ''}</div></div>
-          <div class="pa-film-row">${ps.map((p) => `<figure>${imgHTML(p)}<figcaption class="mono">${esc(capText(p))}</figcaption></figure>`).join('')}</div></div>`;
-      }).join('');
-      more = fl.length > state.shown;
-    }
-    $('#wall-body').innerHTML = html || '<p class="label" style="padding:40px 0">没有符合条件的海报。</p>';
-    $('#more').hidden = !more;
+/* ---------- the viewing room ---------- */
+function preload(m, v) { if (!m) return; const p = posters(m)[v]; if (p) { const i = new Image(); i.src = p.f; } }
+function show(dir = 0) {
+  if (!list.length) return;
+  const m = list[fi], ps = posters(m), p = ps[vi];
+  // poster (two layers crossfade); skipped when only the side panel changes
+  if (p.f !== shownPath) {
+    shownPath = p.f;
+    const my = ++seq, imgs = [...frame.querySelectorAll('img')], next = imgs[layer ^ 1];
+    frame.style.setProperty('--ar', p.w && p.h ? (p.w / p.h).toFixed(3) : .667);
+    next.classList.remove('on');
+    const url = new URL(p.f, location.href).href;
+    const reveal = () => {
+      if (my !== seq) return;   // a newer step already started
+      $('.loading', frame).hidden = true;
+      void next.offsetWidth;   // commit the hidden state first so the fade-in always runs
+      imgs.forEach((im) => im.classList.toggle('on', im === next));
+    };
+    next.onload = reveal;
+    if (next.src === url && next.complete && next.naturalWidth) reveal();   // same image again: no load event fires
+    else next.src = url;
+    next.alt = `《${m.t}》${label(p)}`;
+    layer ^= 1;
+    // background glow from the same poster
+    const bgs = [...document.querySelectorAll('.px-bg img')], b = bgs[layer];
+    const bgUrl = url, glow = () => { if (my === seq) bgs.forEach((im) => im.classList.toggle('on', im === b)); };
+    b.onload = glow;
+    if (b.src === bgUrl && b.complete && b.naturalWidth) glow(); else b.src = bgUrl;
   }
-  document.querySelector('.pa-controls').addEventListener('click', (e) => {
-    const c = e.target.closest('.chip'); if (!c) return;
-    if ('year' in c.dataset) state.year = c.dataset.year;
-    if ('kind' in c.dataset) state.kind = c.dataset.kind;
-    render(true);
-  });
-  $('#f-region').addEventListener('change', (e) => { state.region = e.target.value; render(true); });
-  $('#f-view').addEventListener('change', (e) => { state.view = e.target.value; render(true); });
-  $('#more').addEventListener('click', () => render(false));
-  render(true);
+  // info
+  const pinned = noteAt(m, p), loose = !pinned && FILM_NOTE[m.id];
+  const badge = $('#badge');
+  badge.hidden = !pinned;
+  if (pinned) badge.innerHTML = `名作${pinned.designer && !/^设计者未公开/.test(pinned.designer) ? `<b>${esc(pinned.designer.split(/[·（(；]/)[0].trim())}</b>` : ''}`;
+  const noteBlock = pinned
+    ? `<div class="px-note-wrap"><div class="lbl"><span>海报赏析 · Poster Notes</span><button data-act="note">${noteOpen === false ? '展开' : '收起'}</button></div>${noteOpen === false ? '' : noteHTML(pinned, true)}</div>`
+    : loose ? `<div class="px-note-wrap"><div class="lbl"><span>关于这部片的海报</span><button data-act="note">${noteOpen ? '收起' : '展开'}</button></div>${noteOpen ? noteHTML(loose, false) : ''}</div>` : '';
+  const meta = [m.y, (m.d || []).slice(0, 2).join(' / '), (m.c || [])[0]].filter(Boolean).map(esc).join('　·　');
+  $('#info').innerHTML = `
+    <div class="px-kicker"><b>No. ${String(ALL.indexOf(m) + 1).padStart(3, '0')}</b>　/　${ALL.length}　·　${esc(m.date.replace(/-/g, '.'))} 看过</div>
+    <h1 class="px-title">${esc(m.t)}</h1>
+    ${m.o && m.o !== m.t ? `<div class="px-orig">${esc(m.o)}</div>` : ''}
+    <div class="px-meta">${meta}${m.r ? `<span class="stars">${'★'.repeat(m.r)}</span>` : ''}</div>
+    ${m.cm && !(pinned && noteOpen !== false) ? `<blockquote class="px-quote">${esc(m.cm.length > 140 ? m.cm.slice(0, 140) + '…' : m.cm)}<small>— ${esc(ME)} 的短评</small></blockquote>` : ''}
+    <div class="px-version"><div class="n">${String(vi + 1).padStart(2, '0')}<small>/ ${String(ps.length).padStart(2, '0')}</small></div>
+      <div class="l"><b>${esc(label(p))}</b><br>${esc(sub(p))}</div></div>
+    ${noteBlock}
+    <div class="px-films">${fi > 0 ? `<button data-jump="-1">↑ ${esc(list[fi - 1].t)}</button>` : ''}${fi < list.length - 1 ? `<button data-jump="1">↓ ${esc(list[fi + 1].t)}</button>` : ''}</div>`;
+  // filmstrip
+  $('#strip').innerHTML = ps.map((q, i) => `<button data-v="${i}" class="${noteAt(m, q) ? 'noted' : ''}" aria-current="${i === vi}" aria-label="第 ${i + 1} 张"><img loading="lazy" src="${esc(q.f)}" alt=""></button>`).join('');
+  const strip = $('#strip'), cur2 = $('#strip [aria-current=true]');   // centre the current thumbnail without scrolling the page
+  if (cur2) strip.scrollTo({ left: cur2.offsetLeft - strip.clientWidth / 2 + cur2.clientWidth / 2, behavior: 'smooth' });
+  // neighbours, so the next step is instant
+  preload(m, vi + 1); preload(m, vi - 1); preload(list[fi + 1], 0); preload(list[fi - 1], 0);
+  history.replaceState(null, '', `#${m.id}/${vi + 1}`);
+  document.title = `《${m.t}》· ${ME} 的海报馆`;
+}
+function noteHTML(n, here) {
+  return `<div class="px-note">
+    <div class="which">${here ? esc([n.region, n.kind, n.year].filter(Boolean).join(' · ')) : '关于其中一张海报' + ([n.kind, n.region].filter(Boolean).length ? '：' + esc([n.region, n.kind].filter(Boolean).join(' ')) : '')}</div>
+    ${n.headline ? `<div class="h">${esc(n.headline)}</div>` : ''}
+    ${n.designer ? `<div class="by">${esc(n.designer)}</div>` : ''}
+    ${(n.text || '').split('\n').filter(Boolean).map((t) => `<p>${esc(t)}</p>`).join('')}
+    ${(n.sources || []).length ? `<div class="src">参考：${n.sources.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>`).join('')}</div>` : ''}</div>`;
+}
+const stepV = (d) => { const n = posters(list[fi]).length; vi = (vi + d + n) % n; show(d); };
+const stepF = (d) => { if (!list.length) return; fi = (fi + d + list.length) % list.length; vi = state.noted ? firstNoted(list[fi]) : 0; noteOpen = null; show(d); };
+function advance() {   // autoplay: through this film's versions, then on to the next film (touring: noted posters only)
+  if (state.noted) { const ps = posters(list[fi]), nx = ps.findIndex((q, i) => i > vi && noteAt(list[fi], q)); if (nx > 0) { vi = nx; show(1); } else stepF(1); return; }
+  if (vi < posters(list[fi]).length - 1) stepV(1); else stepF(1);
+}
+function setPlay(on) {
+  playing = on; clearTimeout(timer);
+  room.classList.toggle('playing', on);
+  document.querySelector('[data-act=play]').setAttribute('aria-pressed', on);
+  document.querySelector('[data-act=play]').textContent = on ? '❚❚ 暂停' : '▶ 播放';
+  const tick = () => { timer = setTimeout(() => { advance(); tick(); }, noteAt(list[fi], posters(list[fi])[vi]) ? 15000 : 6000); };
+  if (on) tick();
+}
 
-  /* lightbox: steps through whatever group the clicked poster belongs to */
-  const box = $('#box');
-  let group = [], at = 0;
-  const show = () => {
-    const p = group[at];
-    $('#box-img').src = p.f; $('#box-img').alt = `《${p.m.t}》${capText(p)}`;
-    $('#box-cap').innerHTML = `<div><b>${esc(p.m.t)}</b>${p.m.o ? `<span class="o">${esc(p.m.o)}</span>` : ''}</div>
-      <div class="mono">${esc(capText(p))}${p.ow ? `　·　原图 ${p.ow} × ${p.oh}` : ''}${p.c ? `　·　${p.c} 条回应` : ''}${p.m.r ? `　·　<span class="stars">${stars(p.m.r)}</span>` : ''}</div>
-      <div class="mono"><a href="${esc(srcLink(p))}" target="_blank" rel="noopener">${p.s === 't' ? '在 TMDB 看原图' : '在豆瓣看原图'} ↗</a>　<span class="dim">${at + 1} / ${group.length}</span></div>`;
-  };
-  document.addEventListener('click', (e) => {
-    const b = e.target.closest('.pa-p'); if (!b) return;
-    const p = ALL.find((x) => x.id === b.dataset.pid); if (!p) return;
-    // step through exactly what is on screen around the clicked poster, in screen order
-    const scope = b.closest('.pa-ver-row') || b.closest('.pa-note') || b.closest('section') || document;
-    group = [...scope.querySelectorAll('.pa-p')].map((x) => ALL.find((y) => y.id === x.dataset.pid)).filter(Boolean);
-    at = Math.max(0, [...scope.querySelectorAll('.pa-p')].indexOf(b));
-    show(); box.showModal();
-  });
-  box.addEventListener('click', (e) => {
-    if (e.target === box || e.target.closest('[data-x]')) return box.close();
-    const s = e.target.closest('[data-step]'); if (s) { at = (at + +s.dataset.step + group.length) % group.length; show(); }
-  });
-  document.addEventListener('keydown', (e) => {
-    if (!box.open) return;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { at = (at + (e.key === 'ArrowRight' ? 1 : -1) + group.length) % group.length; show(); }
-  });
+/* ---------- index ---------- */
+function applyFilters() {
+  list = ALL.filter((m) => (!state.year || m.date.startsWith(state.year)) && (!state.five || m.r === 5) && (!state.noted || hasNote(m)));
+  if (state.sort === 'year') list.sort((a, b) => (b.y || 0) - (a.y || 0));
+  if (state.sort === 'old') list.sort((a, b) => (a.y || 9999) - (b.y || 9999));
+  if (state.sort === 'most') list.sort((a, b) => posters(b).length - posters(a).length);
+  return list;
+}
+function renderIndex() {
+  applyFilters();
+  $('#index-sub').textContent = `${ALL.length} 部影视，${total} 张海报（看起来相同的版本已合并）。当前 ${list.length} 部。`;
+  $('#filters').innerHTML = [['', '全部年份'], ...years.map((y) => [y, y])].map(([v, l]) => `<button class="chip" data-year="${v}" aria-pressed="${state.year === v}">${l}</button>`).join('')
+    + `<span class="sep"></span><button class="chip" data-five aria-pressed="${state.five}">只看五星</button><button class="chip" data-noted aria-pressed="${state.noted}">有赏析 ${ALL.filter(hasNote).length}</button>`
+    + `<select id="sort" aria-label="排序"><option value="date">最近看过</option><option value="year">上映年份 新→旧</option><option value="old">上映年份 旧→新</option><option value="most">海报最多</option></select>`;
+  $('#sort').value = state.sort;
+  $('#grid').innerHTML = list.map((m, i) => `<button class="px-card" data-go="${i}"><div class="img"><img loading="lazy" src="${esc(posters(m)[0].f)}" alt=""><span class="k">${posters(m).length} 款</span>${hasNote(m) ? '<span class="tag">赏析</span>' : ''}</div>
+    <div class="t">${esc(m.t)}</div><div class="m">${[m.y, m.date.slice(0, 4) + ' 看过'].filter(Boolean).join(' · ')}${m.r === 5 ? ' <span class="s">★★★★★</span>' : ''}</div></button>`).join('')
+    || '<p class="sub">没有符合条件的影片。</p>';
+}
+const openIndex = () => { setPlay(false); renderIndex(); idx.classList.add('open'); idx.scrollTop = 0; };
+const closeIndex = () => idx.classList.remove('open');
+idx.addEventListener('click', (e) => {
+  const c = e.target.closest('.chip');
+  if (c) { if ('year' in c.dataset) state.year = c.dataset.year; if ('five' in c.dataset) state.five = !state.five; if ('noted' in c.dataset) { state.noted = !state.noted; document.querySelector('[data-act=tour]').setAttribute('aria-pressed', state.noted); } renderIndex(); return; }
+  const g = e.target.closest('[data-go]');
+  if (g) { fi = +g.dataset.go; vi = hasNote(list[fi]) ? firstNoted(list[fi]) : 0; noteOpen = null; closeIndex(); show(); return; }
+  if (e.target.closest('[data-act=close]')) { closeIndex(); }
+});
+idx.addEventListener('change', (e) => { if (e.target.id === 'sort') { state.sort = e.target.value; renderIndex(); } });
+
+/* ---------- controls ---------- */
+document.addEventListener('click', (e) => {
+  if (idx.contains(e.target)) return;
+  const t = e.target.closest('[data-act],[data-step],[data-jump],[data-v]');
+  if (!t) return;
+  if (t.dataset.step) stepV(+t.dataset.step);
+  if (t.dataset.jump) stepF(+t.dataset.jump);
+  if (t.dataset.v) { vi = +t.dataset.v; show(); }
+  const a = t.dataset.act;
+  if (a === 'index') openIndex();
+  if (a === 'play') setPlay(!playing);
+  if (a === 'note') { const pinnedNow = noteAt(list[fi], posters(list[fi])[vi]); noteOpen = pinnedNow ? noteOpen === false : !noteOpen; show(); }
+  if (a === 'tour') {
+    const here = list[fi], hereV = vi;
+    state.noted = !state.noted; t.setAttribute('aria-pressed', state.noted); applyFilters();
+    const at = list.indexOf(here);   // stay on the current film when it is still in the list
+    if (at >= 0) { fi = at; vi = state.noted ? firstNoted(here) : hereV; } else { fi = 0; vi = list.length ? firstNoted(list[0]) : 0; }
+    noteOpen = null; if (list.length) show();
+  }
+  if (a === 'shuffle') { fi = Math.floor(Math.random() * list.length); vi = Math.floor(Math.random() * posters(list[fi]).length); noteOpen = null; show(); }
+  if (playing && a !== 'play') setPlay(true);   // restart the clock after a manual step
+});
+document.addEventListener('keydown', (e) => {
+  if (e.target.closest && e.target.closest('input, select, textarea')) return;
+  if (idx.classList.contains('open')) { if (e.key === 'Escape' || e.key.toLowerCase() === 'i') closeIndex(); return; }
+  const k = e.key;
+  if (k === 'ArrowRight') stepV(1); else if (k === 'ArrowLeft') stepV(-1);
+  else if (k === 'ArrowDown' || k === 'j') stepF(1); else if (k === 'ArrowUp' || k === 'k') stepF(-1);
+  else if (k === ' ') setPlay(!playing);
+  else if (k.toLowerCase() === 'i') openIndex();
+  else if (k.toLowerCase() === 'f') { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); }
+  else return;
+  e.preventDefault();
+  if (playing && k !== ' ') setPlay(true);
+});
+let touch = null;   // swipe: left/right = versions, up/down on the poster = films
+$('#stage').addEventListener('touchstart', (e) => { touch = [e.touches[0].clientX, e.touches[0].clientY]; }, { passive: true });
+$('#stage').addEventListener('touchend', (e) => {
+  if (!touch) return;
+  const dx = e.changedTouches[0].clientX - touch[0], dy = e.changedTouches[0].clientY - touch[1]; touch = null;
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) stepV(dx < 0 ? 1 : -1);
+  else if (Math.abs(dy) > 60) stepF(dy < 0 ? 1 : -1);
+});
+
+/* ---------- start: deep link (#doubanId/version) or the most recent film ---------- */
+if (!ALL.length) {
+  $('#info').innerHTML = '<h1 class="px-title">海报馆还是空的</h1><p class="px-meta">生成时选择「观影志 + 海报馆」，就会收集每部影视的海报。</p>';
+} else {
+  const [hid, hv] = location.hash.slice(1).split('/');
+  const at = ALL.findIndex((m) => m.id === hid);
+  if (at >= 0) { fi = at; vi = Math.max(0, Math.min(posters(ALL[at]).length - 1, (+hv || 1) - 1)); }
+  show();
 }
 </script>
 </body>

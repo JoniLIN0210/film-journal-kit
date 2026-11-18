@@ -292,10 +292,10 @@
         const src = img && img.src.replace(/\/view\/photo\/[a-z_]+\//, '/view/photo/m_ratio_poster/').replace(/\.webp$/, '.jpg');
         return { id: li.dataset.id, s: 'd', src, k: k || '海报', g, note, ow: dim[0] || 0, oh: dim[1] || 0, c };
       }).filter((p) => p.id && p.src);
-      // shrink to ~360px wide JPEG (keeps the zip small) and take an 8×8 average-hash fingerprint for de-duplication
+      // shrink to ~480px wide JPEG (big enough for the full-screen poster room, still a manageable zip) and take an 8×8 average-hash fingerprint for de-duplication
       const shrink = async (blob) => {
         const bmp = await createImageBitmap(blob);
-        const W = Math.min(360, bmp.width), H = Math.round(bmp.height * W / bmp.width);
+        const W = Math.min(480, bmp.width), H = Math.round(bmp.height * W / bmp.width);
         const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
         const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0, W, H);
         const t = document.createElement('canvas'); t.width = t.height = 8;
@@ -304,7 +304,7 @@
         for (let i = 0; i < 64; i++) gray.push(px[i * 4] * 0.3 + px[i * 4 + 1] * 0.59 + px[i * 4 + 2] * 0.11);
         const avg = gray.reduce((x, y) => x + y, 0) / 64;
         if (bmp.close) bmp.close();
-        return { blob: await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.76)), w: W, h: H, hash: gray.map((v) => (v > avg ? 1 : 0)) };
+        return { blob: await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.8)), w: W, h: H, hash: gray.map((v) => (v > avg ? 1 : 0)) };
       };
       const same = (a, b) => { let d = 0; for (let i = 0; i < 64; i++) d += a[i] !== b[i]; return d <= 6; };
       // download + shrink in parallel; keeping (with de-duplication) happens afterwards, in priority order
@@ -381,11 +381,21 @@
             const cur = CUR[f.id];
             if (cur && cur.items) {
               curation[f.id] = cur;
+              // the poster a note is about: an exact TMDB image (its image server needs no key), else a Douban photo
+              const pins = [];
               for (const it of cur.items) {
-                if (!it.photo || kept.some((q) => q.s === 'd' && q.id === it.photo)) continue;
-                const [p] = await prep([{ id: it.photo, s: 'd', src: `https://img1.doubanio.com/view/photo/m_ratio_poster/public/p${it.photo}.jpg`, k: it.kind || '正式海报', g: it.region || '', c: 0 }]);
-                if (p) await keep(p, kept, true);  // always keep the curated one, even if it looks like another
+                const tid = it.tmdb ? it.tmdb.replace(/^\/|\.\w+$/g, '') : '';
+                let p = kept.find((q) => (tid && q.s === 't' && q.id === tid) || (it.photo && q.s === 'd' && q.id === it.photo));
+                if (!p && tid) [p] = await prep([{ id: tid, s: 't', src: 'https://image.tmdb.org/t/p/w500' + it.tmdb, k: it.kind || '正式海报', g: it.region || '' }]);
+                if (!p && it.photo) [p] = await prep([{ id: it.photo, s: 'd', src: `https://img1.doubanio.com/view/photo/m_ratio_poster/public/p${it.photo}.jpg`, k: it.kind || '正式海报', g: it.region || '' }]);
+                if (!p) continue;
+                if (!kept.includes(p)) {
+                  for (let i = kept.length - 1; i >= 0; i--) if (same(kept[i].hash, p.hash)) { delete galleryFiles[kept[i].f]; kept.splice(i, 1); }   // drop its look-alikes
+                  await keep(p, kept, true);
+                }
+                pins.push(p);
               }
+              kept.sort((x, y) => pins.includes(y) - pins.includes(x));   // noted posters first
             }
           } catch (e) {
             if (e === SKIP) gstop = true; else if (cancelled) throw e;
