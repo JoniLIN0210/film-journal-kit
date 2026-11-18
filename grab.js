@@ -431,7 +431,8 @@
     Object.assign(files, galleryFiles);
     files['README.txt'] = '\ufeff' + [
       `${name} 的观影志 · 生成于 ${now}`, '',
-      '打开方式：双击 index.html（主页）或 report.html（年度报告）' + (gcount ? '，海报馆是 posters.html。' : '。'),
+      '第一步一定要先解压：Windows 右键压缩包 →「全部解压缩」；Mac 双击压缩包。在压缩包里直接双击网页会显示不完整。',
+      '打开方式：在解压出来的文件夹里双击 index.html（主页）或 report.html（年度报告）' + (gcount ? '，海报馆是 posters.html。' : '。'),
       '看其他年份的年度报告：在 report.html 的地址末尾加上 ?y=2025 这样的年份。',
       '分享：页面右上角“分享”可以生成 1080px 宽的长图。',
       '更新：以后在豆瓣标记了新的影视，再点一次收藏栏里的按钮，下载新的一份替换掉这个文件夹即可。',
@@ -445,7 +446,7 @@
     const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     const detailed = list.filter((f) => f.detail).length;
     finish('完成了 🎬',
-      `共 ${rows.length} 部影视${gcount ? `，海报馆收集了 ${gcount} 张海报` : ''}，已下载「${filename}」（${(zip.size / 1048576).toFixed(1)} MB）。解压后双击里面的 index.html 就能打开你的观影志。` +
+      `共 ${rows.length} 部影视${gcount ? `，海报馆收集了 ${gcount} 张海报` : ''}，已下载「${filename}」（${(zip.size / 1048576).toFixed(1)} MB）。请先解压（Windows：右键压缩包 →「全部解压缩」；Mac：双击压缩包），再打开解压出来的文件夹里的 index.html。不要在压缩包里直接双击网页，那样会显示不完整。` +
       (tmdbNote ? ' ' + tmdbNote : '') + (blocked ? ` 有 ${list.length - detailed} 部的详情这次没读到（豆瓣暂时拦截了），用了列表页的简要信息；过一段时间再点一次按钮会更完整。`
         : detailed < list.length ? ` 有 ${list.length - detailed} 部的详情页打不开（通常是豆瓣已下架的条目），用了列表页的简要信息。` : ''),
       `<a class="b solid" href="${url}" download="${filename}">没有自动下载？点这里</a><button class="ok-btn">关闭</button>`);
