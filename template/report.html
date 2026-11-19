@@ -99,7 +99,7 @@
     <div class="wrap">
       <div class="mono reveal" style="margin-bottom:28px">Fin.</div>
       <div class="big reveal" id="fin"></div>
-      <p class="reveal" style="margin-top:48px"><a class="pill mono" style="text-decoration:none;display:inline-block;padding:14px 30px !important" href="index.html">← 回到观影志</a></p>
+      <p class="reveal" style="margin-top:48px"><button class="pill mono" data-share="cards" style="display:inline-block;padding:14px 30px !important;margin-right:12px;cursor:pointer">生成小红书卡片 ↗</button><a class="pill mono" style="text-decoration:none;display:inline-block;padding:14px 30px !important" href="index.html">← 回到观影志</a></p>
     </div>
   </section>
 </main>
@@ -138,7 +138,7 @@ const hours = Math.round(sum(Y, (m) => m.rt) / 60);
 $('#asof').textContent = `数据截至 ${last.date.replace(/-/g, '.')}`;
 $('#cover-p').innerHTML = `${md(first.date)}到${md(last.date)}，<b>${Y.length}</b> 部影视，<b>${hours}</b> 个小时。一份只属于 ${esc(ME)} 的年度观影报告。`;
 const reelSet = (fives.length >= 10 ? fives : Y).filter((m) => m.p).slice(-18).reverse();
-$('#reel').innerHTML = (reelSet.length >= 6 ? [...reelSet, ...reelSet] : reelSet).map((m) => posterHTML(m)).join('');
+if (reelSet.length >= 5) $('#reel').innerHTML = [...reelSet, ...reelSet].map((m) => posterHTML(m)).join(''); else document.querySelector('.reel').hidden = true;
 
 /* 01 */
 const days = new Set(Y.map((m) => m.date)).size, diff = Y.length - P.length;
@@ -221,7 +221,20 @@ initShare(() => ({
   postersTitle: fives.length >= 4 ? '年度五星' : '今年看过', postersEn: fives.length >= 4 ? '★★★★★' : 'this year',
   posters: (fives.length >= 4 ? fives : Y).filter((m) => m.p).slice(-12).reverse(),
   quote: longNote ? { text: longNote.cm, by: `${ME} 写给${film(longNote)} · ${longNote.date}` } : null,
-}), `film-journal-${YEAR}.png`);
+}), `film-journal-${YEAR}.png`, {
+  cards: () => ({
+    title: String(YEAR), latin: true, script: 'A Year in Film', stamp: `${YEAR} 年度观影`,
+    line: `${md(first.date)}到${md(last.date)}，${Y.length} 部影视，${hours} 个小时${fives.length ? `，${fives.length} 部五星` : ''}。`,
+    figures: [[Y.length, '部影视', 'Films this year'], [hours, '小时', 'Total runtime'], [days, '个观影日', 'Days with a mark'], [fives.length, '部五星', 'Five-star picks']],
+    months: months.slice(0, lastMonth).map(([k, n]) => [k, n]), monthsNote: busyM[1] ? `最高产的是 ${busyM[0]}，看了 ${busyM[1]} 部。` : '',
+    charts: [{ title: '类型', en: 'genres', rows: genres }, { title: '产地', en: 'places', rows: countries }, dirs.length ? { title: '导演', en: 'on repeat', rows: dirs } : null].filter(Boolean),
+    facts: facts.map(([v, u, , d]) => [v, u, d]),
+    posters: { title: fives.length >= 3 ? '年度五星' : '今年看过', en: fives.length >= 3 ? '★★★★★' : 'this year', list: (fives.length >= 3 ? fives : Y).filter((m) => m.p).slice(-9).reverse() },
+    quote: longNote ? { text: longNote.cm, by: `${ME} 写给${film(longNote)} · ${longNote.date}` } : null,
+    fin: [`${Y.length} 部影视`, `${hours} 个小时`, '下一部见。'],
+  }),
+  wall: () => [Y.slice().reverse(), `${YEAR} · ${Y.length} 部`, `${ME} 的 ${YEAR} 年，按看过的时间排列`],
+});
 }
 initReveal();
 </script>

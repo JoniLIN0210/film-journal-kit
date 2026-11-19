@@ -50,6 +50,13 @@
     <div class="wrap reveal" id="latest-body"></div>
   </section>
 
+  <section class="t-white" id="today" style="padding-bottom:0">
+    <div class="wrap today reveal">
+      <div id="otd"></div>
+      <div id="rewatch"></div>
+    </div>
+  </section>
+
   <section class="t-white" id="taste">
     <div class="wrap">
       <div class="head reveal"><div class="idx mono">02 — Taste</div><h2>口味<i>of <span data-me></span></i></h2><p>类型、产地、年代，与反复出现的名字。一部影片可同时计入多个类型和国家/地区。</p></div>
@@ -142,8 +149,9 @@ const RY = years[years.length - 1][0];
 document.querySelectorAll('[data-ry]').forEach((el) => { el.textContent = RY; });
 let reelSet = five.filter((m) => m.date && m.p).sort(byDateDesc).slice(0, 18);
 if (reelSet.length < 8) reelSet = dated.filter((m) => m.p).slice(0, 18);
-$('#reel').innerHTML = [...reelSet, ...reelSet].map((m) => posterHTML(m)).join('');
-$('#ticker').innerHTML = [0, 1].map(() => dated.slice(0, 24).map((m) => `<span>${esc(m.t)}</span>`).join('')).join('');
+if (reelSet.length >= 5) $('#reel').innerHTML = [...reelSet, ...reelSet].map((m) => posterHTML(m)).join(''); else $('.reel').hidden = true;
+const tick = dated.slice(0, 24); while (tick.length && tick.length < 16) tick.push(...tick.slice(0, 16 - tick.length));
+$('#ticker').innerHTML = [0, 1].map(() => tick.map((m) => `<span>${esc(m.t)}</span>`).join('')).join('');
 
 /* numbers */
 $('#numbers-p').textContent = `从 ${years[0][0]} 年开始记录。${M.length - series.length} 部电影，${series.length} 部剧集（剧集时长按“单集片长 × 集数”计入）。`;
@@ -162,6 +170,41 @@ document.querySelectorAll('#c-ratings .hbar').forEach((el, i) => { if (i < 5) el
 const lead = dated.slice(0, 5).find((m) => m.cm) || dated[0];
 $('#latest-body').innerHTML = featureHTML(lead, `Latest — ${ME} 最近看了`);
 
+/* on this day: films marked on today's date in earlier years (or within a few days of it) */
+(() => {
+  const now = new Date(Date.now() + 8 * 3600e3), thisY = now.getUTCFullYear(), dayOf = (y, md) => Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3, 5));
+  const today = dayOf(2000, now.toISOString().slice(5, 10));
+  const past = dated.filter((m) => +m.date.slice(0, 4) < thisY);
+  const near = (w) => past.filter((m) => Math.abs(dayOf(2000, m.date.slice(5, 10)) - today) <= w * 864e5);
+  let hits = near(0), when = '今天';
+  if (!hits.length) { hits = near(3); when = '这几天'; }
+  if (!hits.length) { hits = near(10); when = '这个时候'; }
+  const ago = (m) => thisY - +m.date.slice(0, 4);
+  hits = hits.sort((a, b) => (b.r || 0) - (a.r || 0) || byDateDesc(a, b)).slice(0, 3);
+  $('#otd').innerHTML = `<div class="idx mono" style="color:var(--hl)">On this day — 那年今天</div>`
+    + (hits.length
+      ? `<h3>${hits.length === 1 ? `<em>${ago(hits[0])}</em> 年前的${when}` : `往年的${when}`}，${esc(ME)} 看了 ${hits.map(film).map(esc).join('')}</h3>
+         <div class="otd">${hits.map((m) => `<button class="mini" data-film="${m.id}">${posterHTML(m)}<span class="ago">${ago(m)} 年前 · ${m.date.replace(/-/g, '.')}</span><span class="t">${esc(m.t)}</span><span class="d mono"><span class="stars">${m.r ? '★'.repeat(m.r) : ''}</span></span></button>`).join('')}</div>`
+      : `<h3>往年的这个时候，还没有观影记录</h3><p class="empty-s">明年的今天，这里会出现今年这个时候看过的电影。</p>`);
+})();
+
+/* rewatch: a random pick from the films rated highly */
+(() => {
+  const pool = M.filter((m) => m.r >= 4).length >= 3 ? M.filter((m) => m.r >= 4) : M;
+  let last = null;
+  const pick = () => {
+    let m; do { m = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && m === last);
+    last = m;
+    $('#rewatch').innerHTML = `<div class="idx mono" style="color:var(--hl)">Rewatch — 不如重看一部</div><h3>今晚，要不要再看一遍？</h3>
+      <div class="rw"><button class="mini" data-film="${m.id}">${posterHTML(m)}</button><div>
+        <div class="t">${esc(m.t)}</div><div class="m">${[m.y, m.d[0], m.date.slice(0, 4) + ' 看过'].filter(Boolean).map(esc).join(' · ')}　<span class="stars">${m.r ? '★'.repeat(m.r) : ''}</span></div>
+        ${m.cm ? `<blockquote>${esc(m.cm.length > 90 ? m.cm.slice(0, 90) + '……' : m.cm)}</blockquote>` : ''}
+        <button class="again" type="button">换一部 ↻</button></div></div>`;
+  };
+  $('#rewatch').addEventListener('click', (e) => { if (e.target.closest('.again')) pick(); });
+  pick();
+})();
+
 /* taste */
 hbars($('#c-genres'), genres.slice(0, 10));
 hbars($('#c-countries'), countries.slice(0, 10));
@@ -169,7 +212,8 @@ $('#country-note').textContent = `共 ${countries.length} 个国家/地区，合
 if (M.some((m) => m.y)) columns($('#c-decades'), decadeRows(M));
 const oldest = M.filter((m) => m.y).sort((a, b) => a.y - b.y)[0];
 $('#decade-note').textContent = oldest ? `最早的一部是 ${oldest.y} 年的《${oldest.t}》` : '';
-$('#c-directors').innerHTML = rankHTML(directors.slice(0, 7));
+const dirRep = directors.filter((x) => x[1] >= 2).slice(0, 7);
+$('#c-directors').innerHTML = dirRep.length ? rankHTML(dirRep) : '<li style="display:block">还没有看过同一位导演的两部作品——每一部都来自不同的人。</li>';
 
 /* band */
 const y26 = M.filter((m) => m.date.startsWith(RY));
@@ -229,6 +273,7 @@ document.querySelector('.filters').addEventListener('click', (e) => {
   apply();
 });
 ['q', 'f-genre', 'f-sort'].forEach((id) => $('#' + id).addEventListener('input', apply));
+const q0 = new URLSearchParams(location.search).get('q'); if (q0) $('#q').value = q0;
 $('#more').addEventListener('click', () => { shown += PAGE; render(); });
 apply();
 
@@ -246,7 +291,9 @@ initShare(() => ({
   ].filter(Boolean),
   postersTitle: five.length >= 8 ? '最近的五星' : '最近看过', posters: reelSet.slice(0, 12),
   quote: notes[0] ? { text: notes[0].cm, by: `${ME} 写给《${notes[0].t}》 · ${notes[0].date}` } : null,
-}), 'film-journal.png');
+}), 'film-journal.png', {
+  wall: () => { const w = dated.slice(0, 144); return [w, `看过的 ${M.length} 部`, `${years[0][0]} — ${years[years.length - 1][0]}${w.length < M.length ? `　·　这里是最近的 ${w.length} 部` : ''}`]; },
+});
 initReveal();
 </script>
 </body>

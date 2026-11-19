@@ -10,7 +10,7 @@
   /* 海报馆 — a dark, full-screen viewing room. One film at a time, the poster as large as the screen allows. */
   html, body.px { height: 100%; overflow: hidden; background: #050506; }
   .px { --ink: #f4f1ea; --dim: rgba(244, 241, 234, .58); --faint: rgba(244, 241, 234, .16); color: var(--ink); }
-  .px button { background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }
+  .px :is(.px-room, .px-index, .px-compare) button { background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }
   .px a { color: inherit; }
 
   .px-bg { position: fixed; inset: -8%; z-index: 0; }
@@ -112,6 +112,24 @@
   .px-card .m { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--dim); margin-top: 3px; }
   .px-card .m .s { color: var(--lime); }
 
+
+  /* compare: every version of one film side by side */
+  .px-compare { position: fixed; inset: 0; z-index: 10; background: rgba(5, 5, 6, .97); overflow-y: auto; padding: 0 clamp(20px, 3vw, 48px) 80px; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .px-compare.open { opacity: 1; pointer-events: auto; }
+  .px-compare h2 { font-family: var(--cn); font-weight: 900; font-size: clamp(40px, 6vw, 96px); line-height: 1; margin: 26px 0 6px; letter-spacing: -.02em; }
+  .px-compare h2 i { font-family: var(--display); font-weight: 400; font-size: .4em; color: var(--lime); margin-left: .3em; }
+  .px-compare .sub { color: var(--dim); font-size: 14px; }
+  .px-cmp-grid { display: flex; flex-wrap: wrap; gap: 34px 18px; align-items: flex-end; }
+  .px-cmp { text-align: left; width: calc(min(46vh, 420px) * var(--ar)); }
+  .px-cmp .img { position: relative; aspect-ratio: var(--ar); overflow: hidden; background: #111; }
+  .px-cmp img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .px-cmp:hover img { transform: scale(1.03); }
+  .px-cmp[aria-current=true] .img { outline: 2px solid var(--lime); outline-offset: 4px; }
+  .px-cmp .tag { position: absolute; left: 6px; top: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; background: var(--lime); color: var(--black); padding: 3px 7px; }
+  .px-cmp .t { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; margin-top: 10px; }
+  .px-cmp .m { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--dim); margin-top: 3px; }
+  @media (max-width: 860px) { .px-cmp { width: calc(50% - 9px); } }
+
   @media (max-width: 860px) {
     html, body.px { overflow: auto; }
     .px-room { position: relative; inset: auto; min-height: 100%; grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; padding: 0 18px; }
@@ -143,7 +161,9 @@
       <button data-act="index">索引 · Index</button>
       <button data-act="play" aria-pressed="false">▶ 播放</button>
       <button data-act="tour" aria-pressed="false">名作导览</button>
+      <button data-act="compare">并排</button>
       <button data-act="shuffle">随机</button>
+      <button data-share="wall">海报墙</button>
       <a href="index.html">主页</a>
     </div>
   </header>
@@ -157,11 +177,20 @@
   </section>
 
   <footer class="px-bottom">
-    <div class="px-hint"><kbd>←</kbd> <kbd>→</kbd> 同一部的不同版本　<kbd>↑</kbd> <kbd>↓</kbd> 换一部<br><kbd>空格</kbd> 自动播放　<kbd>I</kbd> 索引　<kbd>F</kbd> 全屏</div>
+    <div class="px-hint"><kbd>←</kbd> <kbd>→</kbd> 同一部的不同版本　<kbd>↑</kbd> <kbd>↓</kbd> 换一部<br><kbd>空格</kbd> 自动播放　<kbd>I</kbd> 索引　<kbd>C</kbd> 并排　<kbd>F</kbd> 全屏</div>
     <div class="px-strip" id="strip"></div>
   </footer>
 </div>
 <div class="px-credit" id="credit"></div>
+
+<section class="px-compare" id="compare" aria-label="并排对比">
+  <div class="px-index-head">
+    <div class="row1"><a class="px-brand" href="index.html"><span class="me" data-me></span>的海报馆<i>Side by side</i></a><div class="px-tools"><button data-act="uncompare">× 回到放映</button></div></div>
+    <h2 id="cmp-title"></h2>
+    <div class="sub" id="cmp-sub"></div>
+  </div>
+  <div class="px-cmp-grid" id="cmp-grid"></div>
+</section>
 
 <section class="px-index" id="index" aria-label="海报索引">
   <div class="px-index-head">
@@ -317,9 +346,33 @@ idx.addEventListener('click', (e) => {
 });
 idx.addEventListener('change', (e) => { if (e.target.id === 'sort') { state.sort = e.target.value; renderIndex(); } });
 
+
+/* ---------- compare: every version of the current film side by side ---------- */
+const cSrc = (q) => q.f, cLbl = (q) => label(q), cSub = (q) => sub(q), cNoted = (m, q) => noteAt(m, q), cAr = (q) => (q.w && q.h ? (q.w / q.h).toFixed(3) : .667);
+const cmp = $('#compare');
+function openCompare() {
+  setPlay(false);
+  const m = list[fi], ps = posters(m);
+  $('#cmp-title').innerHTML = `${esc(m.t)}<i>${ps.length} version${ps.length > 1 ? 's' : ''}</i>`;
+  $('#cmp-sub').textContent = ps.length > 1 ? `同一部影片的 ${ps.length} 张海报，并排看看各个版本的差别。点任意一张，回到放映看大图。` : '这一部只收集到一张海报。';
+  $('#cmp-grid').innerHTML = ps.map((q, i) => `<button class="px-cmp" data-cv="${i}" aria-current="${i === vi}" style="--ar:${cAr(q)}"><div class="img"><img loading="lazy" src="${esc(cSrc(q))}" alt="">${cNoted(m, q) ? '<span class="tag">名作</span>' : ''}</div><div class="t">${String(i + 1).padStart(2, '0')}　${esc(cLbl(q))}</div><div class="m">${esc(cSub(q))}</div></button>`).join('');
+  cmp.classList.add('open'); cmp.scrollTop = 0;
+}
+const closeCompare = () => cmp.classList.remove('open');
+cmp.addEventListener('click', (e) => {
+  const c = e.target.closest('[data-cv]');
+  if (c) { vi = +c.dataset.cv; closeCompare(); show(); return; }
+  if (e.target.closest('[data-act=uncompare]')) closeCompare();
+});
+
+/* ---------- poster wall: the films currently in the room, one cover each, as a share image ---------- */
+initShare(null, 'film-journal-posters.png', {
+  wall: () => { const w = list.slice(0, 144); return [w, state.year ? `${state.year} · ${list.length} 部` : `看过的 ${list.length} 部`, (state.noted ? '有海报赏析的名作' : state.five ? '五星片单' : '每一部，一张海报') + (list.length > w.length ? `　·　这里是最近的 ${w.length} 部` : '')]; },
+});
+
 /* ---------- controls ---------- */
 document.addEventListener('click', (e) => {
-  if (idx.contains(e.target)) return;
+  if (idx.contains(e.target) || cmp.contains(e.target) || e.target.closest('dialog')) return;
   const t = e.target.closest('[data-act],[data-step],[data-jump],[data-v]');
   if (!t) return;
   if (t.dataset.step) stepV(+t.dataset.step);
@@ -327,6 +380,7 @@ document.addEventListener('click', (e) => {
   if (t.dataset.v) { vi = +t.dataset.v; show(); }
   const a = t.dataset.act;
   if (a === 'index') openIndex();
+  if (a === 'compare') openCompare();
   if (a === 'play') setPlay(!playing);
   if (a === 'note') { const pinnedNow = noteAt(list[fi], posters(list[fi])[vi]); noteOpen = pinnedNow ? noteOpen === false : !noteOpen; show(); }
   if (a === 'tour') {
@@ -341,12 +395,15 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.target.closest && e.target.closest('input, select, textarea')) return;
+  if (document.querySelector('dialog[open]')) return;
+  if (cmp.classList.contains('open')) { if (e.key === 'Escape' || e.key.toLowerCase() === 'c') closeCompare(); return; }
   if (idx.classList.contains('open')) { if (e.key === 'Escape' || e.key.toLowerCase() === 'i') closeIndex(); return; }
   const k = e.key;
   if (k === 'ArrowRight') stepV(1); else if (k === 'ArrowLeft') stepV(-1);
   else if (k === 'ArrowDown' || k === 'j') stepF(1); else if (k === 'ArrowUp' || k === 'k') stepF(-1);
   else if (k === ' ') setPlay(!playing);
   else if (k.toLowerCase() === 'i') openIndex();
+  else if (k.toLowerCase() === 'c') openCompare();
   else if (k.toLowerCase() === 'f') { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); }
   else return;
   e.preventDefault();

@@ -21,6 +21,10 @@ const stars = (r) => (r ? '★'.repeat(r) + '☆'.repeat(5 - r) : '');
 const doubanUrl = (m) => `https://movie.douban.com/subject/${m.id}/`;
 const film = (m) => `《${m.t}》`;
 const byDateDesc = (a, b) => b.date.localeCompare(a.date);
+/* links between the pages: a person -> everything of theirs in the archive; a film -> its posters */
+const personHref = (n) => `index.html?q=${encodeURIComponent(n)}#archive`;
+const whoLink = (n) => `<a class="who" href="${personHref(n)}" data-who="${esc(n)}">${esc(n)}</a>`;
+const hasPosters = () => !!(PROFILE.posters || document.querySelector('a[href="posters.html"]'));
 
 function posterHTML(m, extra = '') {
   return `<div class="poster${m.p ? '' : ' broken'}">${extra}${m.p ? `<img loading="lazy" src="${esc(m.p)}" alt="${esc(m.t)}" onerror="this.parentNode.classList.add('broken')">` : ''}<span class="fallback">${esc(m.t)}</span></div>`;
@@ -38,7 +42,7 @@ function featureHTML(m, kicker) {
     <h3>${esc(m.t)}</h3>${m.o && m.o !== m.t ? `<div class="orig">${esc(m.o)}</div>` : ''}
     <div class="meta">${metaLine(m)}<br>${esc(ME)} 标记于 ${esc(m.date)}${m.r ? `  <span class="stars">${stars(m.r)}</span>` : ''}</div>
     ${m.cm ? `<blockquote>${esc(m.cm)}</blockquote>` : ''}
-    <a class="link" href="${doubanUrl(m)}" target="_blank" rel="noopener">在豆瓣查看 →</a>
+    <div class="links"><a class="link" href="${doubanUrl(m)}" target="_blank" rel="noopener">在豆瓣查看 →</a>${hasPosters() ? `<a class="link" href="posters.html#${m.id}/1">看它的海报 →</a>` : ''}${m.d.filter((d) => M.filter((x) => x.d.includes(d)).length > 1).slice(0, 2).map((d) => `<a class="link who" href="${personHref(d)}" data-who="${esc(d)}">${esc(d)} 的其他作品 →</a>`).join('')}</div>
   </div></div>`;
 }
 
@@ -65,7 +69,7 @@ function decadeRows(list) {
 }
 /** Ranked list rows: [[name, n, movies]] */
 function rankHTML(rows) {
-  return rows.map(([k, n, ms]) => `<li><span class="nm">${esc(k)}</span><span class="c">${n}</span><span class="films">${esc(ms.map((x) => x.t).join(' · '))}</span></li>`).join('');
+  return rows.map(([k, n, ms]) => `<li><span class="nm">${whoLink(k)}</span><span class="c">${n}</span><span class="films">${esc(ms.map((x) => x.t).join(' · '))}</span></li>`).join('');
 }
 /** Big numeral tiles: [[value, unit, label]] */
 function figuresHTML(rows) {
@@ -140,6 +144,16 @@ document.title = document.title.replace('{me}', ME);
   });
   dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('.close')) dlg.close(); });
 })();
+
+/* ---------- a person's name: on the main page filter the archive in place, elsewhere go there ---------- */
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-who]'), q = document.getElementById('q');
+  if (!a || !q) return;
+  e.preventDefault();
+  document.querySelectorAll('dialog[open]').forEach((d) => d.close());
+  q.value = a.dataset.who; q.dispatchEvent(new Event('input'));
+  document.getElementById('archive').scrollIntoView({ behavior: 'smooth' });
+});
 
 /* ---------- scroll reveal ---------- */
 function initReveal() {
@@ -275,8 +289,182 @@ async function renderShare(spec) {
   return out;
 }
 
-/** Wires every [data-share] button to a share dialog. `buildSpec` returns the spec for renderShare. */
-function initShare(buildSpec, filename) {
+/* ---------- small-format share images: 3:4 cards (小红书 / 朋友圈 sets) and a poster wall ---------- */
+const SH = { blue: '#1633e6', lime: '#dfff4f', black: '#0b0b0c', white: '#ffffff', gray: '#6a6a72',
+  CN: "'Songti SC','Noto Serif SC','STSong','SimSun',serif", DP: "Didot,'Bodoni 72','Playfair Display','Songti SC',serif",
+  SANS: "'Helvetica Neue','PingFang SC','Microsoft YaHei',sans-serif", MONO: "'SF Mono',Menlo,Consolas,'PingFang SC',monospace" };
+const loadImg = (src) => new Promise((res) => { if (!src) return res(null); const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+function pen(x) {
+  const text = (s, px, py, font, color, align = 'left', spacing = 0) => { x.font = font; x.fillStyle = color; x.textAlign = align; if ('letterSpacing' in x) x.letterSpacing = spacing + 'px'; x.fillText(s, px, py); if ('letterSpacing' in x) x.letterSpacing = '0px'; return x.measureText(s).width; };
+  const fit = (s, font, size, max) => { x.font = font.replace('{s}', size); const w = x.measureText(s).width; return w > max ? Math.floor(size * max / w) : size; };
+  const wrap = (s, font, max, maxLines) => {
+    x.font = font; const lines = []; let cur = '';
+    for (const ch of [...String(s).replace(/\n+/g, '\n')]) {
+      if (ch === '\n') { lines.push(cur); cur = ''; continue; }
+      if (x.measureText(cur + ch).width > max) { lines.push(cur); cur = ch; } else cur += ch;
+    }
+    if (cur) lines.push(cur);
+    if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] = lines[maxLines - 1].slice(0, -2) + '……'; }
+    return lines;
+  };
+  const cover = (im, px, py, pw, ph, title) => {
+    if (im) { const s = Math.max(pw / im.width, ph / im.height), sw = pw / s, sh = ph / s; x.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, px, py, pw, ph); return; }
+    x.fillStyle = SH.blue; x.fillRect(px, py, pw, ph);
+    const fs = Math.max(12, Math.round(pw / 7));
+    wrap(title || '', `900 ${fs}px ${SH.CN}`, pw - fs, 4).forEach((l, j) => text(l, px + fs / 2, py + fs * 1.6 + j * fs * 1.3, `900 ${fs}px ${SH.CN}`, SH.white));
+  };
+  return { text, fit, wrap, cover };
+}
+
+/**
+ * A set of 1080×1440 (3:4) cards. spec: { title, script, line, figures:[[v,u,k]x4], months:[[label,n]], monthsNote,
+ *   charts:[{title, en, rows:[[k,n]]}], facts:[[v,u,caption]], posters:{title, en, list:[movie]}, quote:{text, by} }
+ */
+async function renderCards(spec) {
+  const W = 1080, H = 1440, P = 84, out = [];
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const make = (bg, fg, draw) => out.push({ bg, fg, draw });
+  const frame = (x, t, bg, fg, n, total) => {
+    x.fillStyle = bg; x.fillRect(0, 0, W, H);
+    const line = fg === SH.white ? 'rgba(255,255,255,.3)' : 'rgba(11,11,12,.2)';
+    t.text(`${ME} 的观影志`, P, 104, `900 30px ${SH.CN}`, fg);
+    t.text(`${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, W - P, 102, `22px ${SH.MONO}`, fg, 'right', 3);
+    x.fillStyle = line; x.fillRect(P, 134, W - 2 * P, 1); x.fillRect(P, H - 120, W - 2 * P, 1);
+    t.text(spec.footer || 'The Film Journal', P, H - 66, `italic 30px ${SH.DP}`, bg === SH.blue || bg === SH.black ? SH.lime : SH.blue);
+    t.text(spec.stamp || '', W - P, H - 68, `20px ${SH.MONO}`, fg, 'right', 2);
+  };
+  const heading = (x, t, cn, en, fg, hl) => { const w = t.text(cn, P, 290, `900 84px ${SH.CN}`, fg); t.text(en, P + w + 24, 290, `italic 44px ${SH.DP}`, hl); };
+
+  /* 1. cover */
+  make(SH.blue, SH.white, (x, t) => {
+    const size = t.fit(spec.title, spec.latin ? `{s}px ${SH.DP}` : `900 {s}px ${SH.CN}`, spec.latin ? 470 : 300, W - 2 * P);
+    t.text(spec.title, P - 10, 330 + size * 0.8, (spec.latin ? `${size}px ${SH.DP}` : `900 ${size}px ${SH.CN}`), SH.white);
+    t.text(spec.script, W - P, 330 + size * 0.8 + 130, `italic ${t.fit(spec.script, `italic {s}px ${SH.DP}`, 110, W - 2 * P)}px ${SH.DP}`, SH.lime, 'right');
+    t.wrap(spec.line, `40px ${SH.SANS}`, W - 2 * P, 3).forEach((l, i, a) => t.text(l, P, H - 200 - (a.length - 1 - i) * 62, `40px ${SH.SANS}`, SH.white));
+  });
+  /* 2. figures */
+  if (spec.figures) make(SH.white, SH.black, (x, t) => {
+    heading(x, t, '数字', 'in figures', SH.black, SH.blue);
+    const cw = (W - 2 * P) / 2;
+    spec.figures.forEach(([v, u, k], i) => {
+      const fx = P + (i % 2) * cw + (i % 2 ? 40 : 0), fy = 380 + Math.floor(i / 2) * 430;
+      t.text(String(v), fx - 6, fy + 200, `${t.fit(String(v), `{s}px ${SH.DP}`, 230, cw - 60)}px ${SH.DP}`, SH.black);
+      t.text(u, fx, fy + 266, `900 40px ${SH.CN}`, SH.black);
+      t.text(String(k).toUpperCase(), fx, fy + 312, `22px ${SH.MONO}`, SH.gray, 'left', 3);
+    });
+    x.fillStyle = 'rgba(11,11,12,.16)'; x.fillRect(W / 2, 400, 1, 780); x.fillRect(P, 800, W - 2 * P, 1);
+  });
+  /* 3. months */
+  if (spec.months && spec.months.some((r) => r[1])) make(SH.black, SH.white, (x, t) => {
+    heading(x, t, '月历', 'month by month', SH.white, SH.lime);
+    const max = Math.max(1, ...spec.months.map((r) => r[1])), n = spec.months.length, gw = (W - 2 * P) / n, base = 1060, hmax = 560;
+    const top = spec.months.reduce((a, r, i) => (r[1] > spec.months[a][1] ? i : a), 0);
+    spec.months.forEach(([k, v], i) => {
+      const h = v ? Math.max(6, hmax * v / max) : 2, bx = P + i * gw + gw * 0.18, bw = gw * 0.64;
+      x.fillStyle = i === top ? SH.lime : v ? SH.white : 'rgba(255,255,255,.25)'; x.fillRect(bx, base - h, bw, h);
+      if (v) t.text(String(v), bx + bw / 2, base - h - 16, `34px ${SH.DP}`, SH.white, 'center');
+      t.text(k.replace('月', ''), bx + bw / 2, base + 44, `22px ${SH.MONO}`, 'rgba(255,255,255,.7)', 'center');
+    });
+    t.wrap(spec.monthsNote || '', `34px ${SH.SANS}`, W - 2 * P, 2).forEach((l, i) => t.text(l, P, 1180 + i * 52, `34px ${SH.SANS}`, SH.white));
+  });
+  /* 4. charts */
+  (spec.charts || []).filter((c) => c.rows.length >= 3).forEach((c, ci) => {
+    const bg = ci % 2 ? SH.white : SH.lime, fg = SH.black;
+    make(bg, fg, (x, t) => {
+      heading(x, t, c.title, c.en || '', fg, SH.blue);
+      const rows = c.rows.slice(0, 7), max = Math.max(1, ...rows.map((r) => r[1])), lw = 250, bw = W - 2 * P - lw - 100;
+      rows.forEach(([k, n], i) => {
+        const cy = 440 + i * 112;
+        t.text(t.wrap(k, `34px ${SH.SANS}`, lw - 20, 1)[0], P, cy + 14, `34px ${SH.SANS}`, fg);
+        x.fillStyle = i === 0 ? SH.blue : SH.black; x.beginPath(); x.roundRect(P + lw, cy - 12, Math.max(6, bw * n / max), 28, [0, 8, 8, 0]); x.fill();
+        t.text(String(n), W - P, cy + 18, `48px ${SH.DP}`, fg, 'right');
+      });
+    });
+  });
+  /* 5. facts */
+  if (spec.facts && spec.facts.length) make(SH.blue, SH.white, (x, t) => {
+    heading(x, t, '之最', 'the most', SH.white, SH.lime);
+    spec.facts.slice(0, 3).forEach(([v, u, cap], i) => {
+      const fy = 400 + i * 280;
+      const w = t.text(String(v), P - 4, fy + 140, `${t.fit(String(v), `{s}px ${SH.DP}`, 170, 560)}px ${SH.DP}`, SH.white);
+      t.text(u, P + w + 16, fy + 140, `900 44px ${SH.CN}`, SH.lime);
+      t.wrap(cap, `32px ${SH.SANS}`, W - 2 * P, 2).forEach((l, j) => t.text(l, P, fy + 200 + j * 46, `32px ${SH.SANS}`, 'rgba(255,255,255,.86)'));
+      if (i) { x.fillStyle = 'rgba(255,255,255,.3)'; x.fillRect(P, fy + 6, W - 2 * P, 1); }
+    });
+  });
+  /* 6. posters */
+  let imgs = [];
+  if (spec.posters && spec.posters.list.length) {
+    const all = spec.posters.list, list = all.slice(0, all.length >= 6 ? 6 : 4);
+    imgs = await Promise.all(list.map((m) => loadImg(m.p)));
+    make(SH.black, SH.white, (x, t) => {
+      heading(x, t, spec.posters.title, spec.posters.en || '', SH.white, SH.lime);
+      const cols = list.length <= 4 ? 2 : 3, gap = 20, pw = (W - 2 * P - gap * (cols - 1)) / cols, ph = Math.min(pw * 1.48, (H - 380 - 170 - gap * (Math.ceil(list.length / cols) - 1)) / Math.ceil(list.length / cols));
+      const pw2 = ph / 1.48, off = (W - 2 * P - (pw2 * cols + gap * (cols - 1))) / 2;
+      list.forEach((m, i) => t.cover(imgs[i], P + off + (i % cols) * (pw2 + gap), 360 + Math.floor(i / cols) * (ph + gap), pw2, ph, m.t));
+    });
+  }
+  /* 7. quote */
+  if (spec.quote) make(SH.white, SH.black, (x, t) => {
+    t.text('“', P - 10, 470, `300px ${SH.DP}`, SH.blue);
+    const ql = t.wrap(spec.quote.text, `42px ${SH.CN}`, W - 2 * P, 12);
+    ql.forEach((l, i) => t.text(l, P, 520 + i * 70, `42px ${SH.CN}`, SH.black));
+    x.fillStyle = 'rgba(11,11,12,.2)'; x.fillRect(P, 520 + ql.length * 70, W - 2 * P, 1);
+    t.wrap(spec.quote.by, `24px ${SH.MONO}`, W - 2 * P, 2).forEach((l, i) => t.text(l, P, 580 + ql.length * 70 + i * 36, `24px ${SH.MONO}`, SH.gray, 'left', 1));
+  });
+  /* 8. fin */
+  make(SH.blue, SH.white, (x, t) => {
+    t.text('Fin.', P, 330, `italic 64px ${SH.DP}`, SH.lime);
+    (spec.fin || ['下一部见。']).forEach((l, i) => t.text(l, P, 560 + i * 150, `900 ${t.fit(l, `900 {s}px ${SH.CN}`, 120, W - 2 * P)}px ${SH.CN}`, SH.white));
+    t.text(isLocal() ? '数据来自我的豆瓣“看过”列表' : shareUrl().replace(/^https?:\/\//, ''), P, H - 190, `24px ${SH.MONO}`, SH.white, 'left', 1);
+  });
+
+  return out.map((c, i) => {
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const x = cv.getContext('2d'), t = pen(x);
+    frame(x, t, c.bg, c.fg, i + 1, out.length);
+    c.draw(x, t);
+    return cv;
+  });
+}
+
+/** A poster wall: every film in `list` (one cover each), as one tall 1080px image. */
+async function renderWall(list, title, sub) {
+  const W = 1080, P = 60, n = list.length;
+  const cols = n <= 12 ? 3 : n <= 30 ? 5 : n <= 70 ? 7 : n <= 140 ? 9 : 12, gap = n <= 30 ? 14 : 8;
+  const pw = (W - 2 * P - gap * (cols - 1)) / cols, ph = pw * 1.48, rows = Math.ceil(n / cols);
+  const imgs = await Promise.all(list.map((m) => loadImg(m.p)));
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const head = 430, foot = 200, Ht = head + rows * (ph + gap) - gap + foot + 40;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = Ht;
+  const x = cv.getContext('2d'), t = pen(x);
+  x.fillStyle = SH.black; x.fillRect(0, 0, W, Ht);
+  x.fillStyle = SH.blue; x.fillRect(0, 0, W, head - 40);
+  t.text(`${ME} 的海报墙`, P, 96, `900 30px ${SH.CN}`, SH.white);
+  t.text('POSTER WALL', W - P, 94, `22px ${SH.MONO}`, SH.lime, 'right', 4);
+  x.fillStyle = 'rgba(255,255,255,.35)'; x.fillRect(P, 128, W - 2 * P, 1);
+  t.text(title, P - 6, 280, `900 ${t.fit(title, `900 {s}px ${SH.CN}`, 140, W - 2 * P)}px ${SH.CN}`, SH.white);
+  t.text(sub, P, 340, `30px ${SH.SANS}`, 'rgba(255,255,255,.86)');
+  list.forEach((m, i) => t.cover(imgs[i], P + (i % cols) * (pw + gap), head + Math.floor(i / cols) * (ph + gap), pw, ph, m.t));
+  const fy = Ht - foot + 60;
+  x.fillStyle = 'rgba(255,255,255,.25)'; x.fillRect(P, fy - 40, W - 2 * P, 1);
+  t.text(`${ME} 的观影志`, P, fy + 40, `900 40px ${SH.CN}`, SH.white);
+  t.text('The Film Journal', W - P, fy + 40, `italic 38px ${SH.DP}`, SH.lime, 'right');
+  t.text(isLocal() ? '数据来自我的豆瓣“看过”列表' : shareUrl().replace(/^https?:\/\//, ''), P, fy + 96, `22px ${SH.MONO}`, 'rgba(255,255,255,.7)', 'left', 1);
+  return cv;
+}
+
+/**
+ * Wires every [data-share] button to a share dialog.
+ * buildSpec → spec for the long image (or null); more: { cards: () => spec for renderCards, wall: () => [list, title, sub] }.
+ */
+function initShare(buildSpec, filename, more = {}) {
+  const base = filename.replace(/\.png$/, '');
+  const kinds = [
+    buildSpec && ['long', '长图', '一张 1080px 宽的长图，适合朋友圈或保存到相册。', '生成长图'],
+    more.cards && ['cards', '小红书卡片', '一组 3:4 的卡片（1080 × 1440），正好发一篇小红书图文或朋友圈九宫格。', '生成卡片组'],
+    more.wall && ['wall', '海报墙', '把看过的影片海报拼成一整面墙，一张图。', '生成海报墙'],
+  ].filter(Boolean);
   const dlg = document.createElement('dialog');
   dlg.className = 't-black share-dlg';
   dlg.innerHTML = `<div class="inner"><button class="close" aria-label="关闭">×</button>
@@ -285,38 +473,48 @@ function initShare(buildSpec, filename) {
       <div>
         <div class="label">01 — 链接</div>
         <div class="linkrow"><input readonly value="${esc(shareUrl())}" aria-label="分享链接"><button class="btn" data-act="copy">复制链接</button></div>
-        <p class="hint">${location.protocol === 'file:' ? '这一份保存在你自己的电脑里，链接别人打不开。想给朋友看，直接生成下面的长图；想要公开链接，可以把整个文件夹上传到任意静态网站托管（如 GitHub Pages）。' : isLocal() ? '现在是本机预览地址，别人打不开。网站部署上线后，这里会自动变成可以发给别人的公开链接。' : '把这个链接发给朋友，对方打开就能看到这一页。'}</p>
-        <div class="label" style="margin-top:28px">02 — 长图</div>
-        <p class="hint">生成一张 1080px 宽的长图，适合发朋友圈、小红书或保存到相册。</p>
-        <div class="linkrow"><button class="btn solid" data-act="make">生成分享长图</button><a class="btn" data-act="save" hidden>下载 PNG</a><button class="btn" data-act="native" hidden>发送…</button></div>
+        <p class="hint">${location.protocol === 'file:' ? '这一份保存在你自己的电脑里，链接别人打不开。想给朋友看，直接生成下面的图片；想要公开链接，可以把整个文件夹上传到任意静态网站托管（如 GitHub Pages）。' : isLocal() ? '现在是本机预览地址，别人打不开。网站部署上线后，这里会自动变成可以发给别人的公开链接。' : '把这个链接发给朋友，对方打开就能看到这一页。'}</p>
+        <div class="label" style="margin-top:28px">02 — 图片</div>
+        ${kinds.length > 1 ? `<div class="kinds">${kinds.map(([k, l], i) => `<button class="chip" data-kind="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div>` : ''}
+        <p class="hint kind-hint">${kinds[0][2]}</p>
+        <div class="linkrow"><button class="btn solid" data-act="make">${kinds[0][3]}</button><button class="btn" data-act="save" hidden>下载</button><button class="btn" data-act="native" hidden>发送…</button></div>
         <p class="hint status" aria-live="polite"></p>
       </div>
-      <div class="preview"><div class="ph mono">长图预览</div></div>
+      <div class="preview"><div class="ph mono">图片预览</div></div>
     </div></div>`;
   document.body.appendChild(dlg);
-  let blob = null;
+  let kind = kinds[0][0], files = [];
   const status = (s) => { $('.status', dlg).textContent = s; };
-  document.addEventListener('click', (e) => { if (e.target.closest('[data-share]')) { e.preventDefault(); dlg.showModal(); } });
+  const reset = () => { files = []; $('[data-act=save]', dlg).hidden = true; $('[data-act=native]', dlg).hidden = true; $('.preview', dlg).innerHTML = '<div class="ph mono">图片预览</div>'; status(''); };
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-share]'); if (b) { e.preventDefault(); if (b.dataset.share && b.dataset.share !== kind) { const c = $(`[data-kind=${b.dataset.share}]`, dlg); if (c) c.click(); } dlg.showModal(); } });
   dlg.addEventListener('click', async (e) => {
     if (e.target === dlg || e.target.closest('.close')) return dlg.close();
+    const kb = e.target.closest('[data-kind]');
+    if (kb) {
+      kind = kb.dataset.kind; const k = kinds.find((x) => x[0] === kind);
+      dlg.querySelectorAll('[data-kind]').forEach((c) => c.setAttribute('aria-pressed', c === kb));
+      $('.kind-hint', dlg).textContent = k[2]; $('[data-act=make]', dlg).textContent = k[3]; reset(); return;
+    }
     const act = e.target.closest('[data-act]')?.dataset.act;
     if (act === 'copy') {
       try { await navigator.clipboard.writeText(shareUrl()); } catch { const i = $('input', dlg); i.select(); document.execCommand('copy'); }
       e.target.textContent = '已复制 ✓'; setTimeout(() => { e.target.textContent = '复制链接'; }, 1600);
     }
     if (act === 'make') {
-      status('正在生成…');
+      status('正在生成…'); reset(); status('正在生成…');
       try {
-        const canvas = await renderShare(buildSpec());
-        blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
-        const url = URL.createObjectURL(blob);
-        $('.preview', dlg).innerHTML = `<img src="${url}" alt="分享长图预览">`;
-        const a = $('[data-act=save]', dlg); a.href = url; a.download = filename; a.hidden = false;
-        const file = new File([blob], filename, { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) $('[data-act=native]', dlg).hidden = false;
-        status(`已生成 ${canvas.width} × ${canvas.height} 像素。手机上也可以长按预览图保存。`);
+        const canvases = kind === 'long' ? [await renderShare(buildSpec())] : kind === 'cards' ? await renderCards(more.cards()) : [await renderWall(...more.wall())];
+        const names = canvases.length > 1 ? canvases.map((_, i) => `${base}-${String(i + 1).padStart(2, '0')}.png`) : [kind === 'wall' ? `${base}-wall.png` : filename];
+        files = await Promise.all(canvases.map(async (c, i) => { const b = await new Promise((res) => c.toBlob(res, 'image/png')); return { name: names[i], url: URL.createObjectURL(b), file: new File([b], names[i], { type: 'image/png' }) }; }));
+        $('.preview', dlg).innerHTML = `<div class="pv ${kind}">${files.map((f) => `<a href="${f.url}" download="${f.name}" title="点击单独下载"><img src="${f.url}" alt=""></a>`).join('')}</div>`;
+        const save = $('[data-act=save]', dlg); save.hidden = false; save.textContent = files.length > 1 ? `全部下载（${files.length} 张）` : '下载 PNG';
+        if (navigator.canShare && navigator.canShare({ files: files.map((f) => f.file) })) $('[data-act=native]', dlg).hidden = false;
+        status(files.length > 1 ? `已生成 ${files.length} 张 1080 × 1440 卡片。点预览里的某一张可以单独下载；手机上也可以长按保存。` : `已生成 ${canvases[0].width} × ${canvases[0].height} 像素。手机上也可以长按预览图保存。`);
       } catch (err) { status('生成失败：' + err.message + (location.protocol === 'file:' && !/^data:/.test((M.find((m) => m.p) || {}).p || 'data:') ? '（请通过 http 地址打开页面，而不是直接双击文件）' : '')); }
     }
-    if (act === 'native' && blob) { try { await navigator.share({ files: [new File([blob], filename, { type: 'image/png' })], title: `${ME} 的观影志` }); } catch { /* cancelled */ } }
+    if (act === 'save' && files.length) {
+      for (const f of files) { const a = document.createElement('a'); a.href = f.url; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); await new Promise((r) => setTimeout(r, 350)); }
+    }
+    if (act === 'native' && files.length) { try { await navigator.share({ files: files.map((f) => f.file), title: `${ME} 的观影志` }); } catch { /* cancelled */ } }
   });
 }
