@@ -124,7 +124,7 @@
       $('h1').textContent = '生成你的观影志';
       say('选一种。两种都会读取你的“看过”列表和每部影片的详情；海报馆会再为每部影片收集各个国家、各个版本的海报，并附上经典海报的赏析。');
       $('.row').innerHTML = '<button class="solid m1">观影志 + 海报馆<small>300 部约 30 分钟</small></button><button class="m0">只要观影志<small>300 部约 7 分钟</small></button><button class="x">取消</button>'
-        + '<details class="adv"><summary>高级：加入 TMDB 海报（可选）</summary><p>TMDB 是全球最大的电影资料库，能多收集各语言版本和无字版海报。填入你自己在 themoviedb.org 免费申请的 API 密钥即可；不填就只用豆瓣。密钥只在这次生成中使用，不会保存或上传。</p><input class="tmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB API Key 或 Read Access Token"></details>';
+        + '<details class="adv"><summary>高级：加入 TMDB 海报（可选）</summary><p>不填也会完整生成。填入后，每部影片会从 TMDB 多收集各语言版和无字版海报（海报赏析的多少与此无关）。密钥需要你自己在 themoviedb.org 申请，适用 TMDB 的使用条款，与本工具无关；它只在这次生成中、在你的浏览器里使用，不会保存或上传。<a href="' + BASE + 'index.html#posters" target="_blank" rel="noopener">怎么申请、要不要填 ↗</a></p><input class="tmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB API Key 或 Read Access Token"></details>';
       $('.m1').onclick = () => { TMDB = ($('.tmdb').value || '').trim() || TMDB; resolve(true); };
       $('.m0').onclick = () => resolve(false);
       $('.x').onclick = () => { cancelled = true; close(); resolve(false); };

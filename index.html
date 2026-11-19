@@ -47,6 +47,19 @@
   .faq div { padding: 22px 0; border-top: 1px solid #e6e6ea; }
   .faq h4 { font: 900 17px/1.4 var(--cn); margin: 0 0 8px; }
   .faq p { margin: 0; font-size: 14px; line-height: 1.8; color: #45454d; }
+  .px2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 48px; border-top: 2px solid var(--black); }
+  .px2 > div { padding: 28px 0 8px; }
+  .px2 h3 { font: 900 22px/1.35 var(--cn); margin: 0 0 12px; }
+  .px2 h3 .tag { font: 600 11px/1 var(--mono); letter-spacing: .12em; padding: 5px 8px; margin-left: 10px; vertical-align: 4px; background: var(--lime); }
+  .px2 h3 .tag.opt { background: none; border: 1.5px solid var(--black); }
+  .px2 p, .px2 li { font-size: 15px; line-height: 1.8; color: #45454d; }
+  .px2 ul, .px2 ol { padding-left: 20px; margin: 0 0 14px; }
+  .px2 li { margin-bottom: 6px; }
+  .px2 b { color: var(--black); }
+  .note-box { margin-top: 18px; padding: 18px 20px; background: #f4f4f6; border-left: 3px solid var(--blue); font-size: 14px; line-height: 1.8; color: #45454d; }
+  .note-box b { color: var(--black); }
+  .tmdb-steps { margin-top: 26px; padding-top: 22px; border-top: 1px solid #e6e6ea; }
+  .tmdb-steps h4 { font: 900 17px/1.4 var(--cn); margin: 0 0 10px; }
   .mobile { display: none; background: var(--black); color: var(--lime); padding: 18px 0; font-size: 15px; line-height: 1.7; }
   .demo { background: var(--black); color: var(--white); }
   .demo h2 { color: var(--white); }
@@ -54,7 +67,7 @@
   .demo .go:hover { background: var(--lime); color: var(--black); }
   footer { padding: 32px 0 48px; color: #6a6a72; font-size: 12px; }
   @media (max-width: 860px) {
-    .steps, .faq { grid-template-columns: 1fr; }
+    .steps, .faq, .px2 { grid-template-columns: 1fr; }
     .step, .step + .step { padding: 28px 0; border-right: 0; border-bottom: 1px solid #e6e6ea; }
     .is-mobile .mobile { display: block; }
   }
@@ -95,7 +108,7 @@
         <div class="n">3</div>
         <h3>点一下收藏栏里的按钮</h3>
         <p>页面上会出现一个蓝色的框，选“观影志 + 海报馆”或“只要观影志”。等进度走完，会自动下载一个压缩包。<b>先解压</b>（Windows 右键压缩包选「全部解压缩」，Mac 双击压缩包），再打开解压出来的文件夹里的 <b>index.html</b>。</p>
-        <p class="hint">300 部左右：只要观影志约 7 分钟，加上海报馆约 30 分钟（要逐部读取海报页，放慢速度以免被豆瓣要求验证）。进行中请不要关闭页面。</p>
+        <p class="hint">300 部左右：只要观影志约 7 分钟，加上海报馆约 30 分钟（要逐部读取海报页，放慢速度以免被豆瓣要求验证）。进行中请不要关闭页面。想多收集一些海报版本？先看下面的<a href="#posters">「海报馆是怎么来的」</a>。</p>
       </div>
     </div>
   </div>
@@ -105,14 +118,58 @@
   <div class="wrap">
     <div class="mono" style="color:var(--lime)">02 — Preview</div>
     <h2>生成出来长这样</h2>
-    <p style="max-width:620px;line-height:1.8;color:rgba(255,255,255,.8)">主页：数字、口味、按月份的观影日历、全部短评和可搜索的片库。年度报告：这一年的月历、首与尾、类型与产地、最常遇见的名字、五星片单。海报馆：每部影片在豆瓣上最受欢迎的几张海报，可以按年份、评分、国家版本筛选，也能看同一部电影在不同国家的样子。主页和年度报告都能一键生成 1080px 宽的分享长图。</p>
+    <p style="max-width:620px;line-height:1.8;color:rgba(255,255,255,.8)">主页：数字、口味、按月份的观影日历、全部短评和可搜索的片库。年度报告：这一年的月历、首与尾、类型与产地、最常遇见的名字、五星片单。海报馆：全屏放映你看过的每一部的海报，同一部电影在不同国家、不同时期的样子；经典名作附有海报赏析。主页和年度报告都能一键生成 1080px 宽的分享长图。</p>
     <a class="go" href="https://jonilin0210.github.io/film-journal/" target="_blank" rel="noopener">看一个示例 ↗</a>
+  </div>
+</section>
+
+<section id="posters">
+  <div class="wrap">
+    <div class="mono kicker">03 — The Poster Room</div>
+    <h2>海报馆是怎么来的</h2>
+    <p style="max-width:720px;font-size:16px;line-height:1.85;color:#45454d;margin:-16px 0 36px">选“观影志 + 海报馆”就会生成。下面左边是不用做任何设置就有的；右边是一个<b>可选</b>步骤，需要你自己判断要不要做。</p>
+    <div class="px2">
+      <div>
+        <h3>默认就有<span class="tag">无需设置</span></h3>
+        <ul>
+          <li><b>你看过的每一部都有海报。</b>按你豆瓣“看过”列表逐部读取它在豆瓣的“海报”页，按豆瓣用户的喜欢排序，取最受欢迎的正式海报和预告海报（每部最多 6 张），标出国家 / 地区版本。</li>
+          <li><b>你打了 4 星以上的，</b>再收集最多 3 张同人与艺术再创作。</li>
+          <li><b>看起来一样的版本会自动合并，</b>不会一张图出现好几次。</li>
+          <li><b>经典海报赏析。</b>我们整理并核实过 46 部经典影片的海报故事（设计师、设计思路、出处），例如《寄生虫》《楚门的世界》《千与千寻》。你看过其中哪几部，那几部的名作海报就会排在最前面，标上“名作”，并附上赏析；点“名作导览”可以只看这些。</li>
+        </ul>
+        <div class="note-box">赏析是固定收录的内容，<b>每个人能看到多少条，只取决于你看过这 46 部里的几部</b>，和下面的 TMDB 密钥无关。赏析配的那张名作海报会从 TMDB 的公开图片服务器下载（不需要密钥）；如果你的网络连不上，有的会换成豆瓣上的同一张海报，其余的赏析文字照常显示，只是不对应具体某一张海报。</div>
+      </div>
+      <div>
+        <h3>可选：用 TMDB 收集更多版本<span class="tag opt">自己决定</span></h3>
+        <p><b>TMDB</b>（The Movie Database，themoviedb.org）是一个国外的电影资料库，海报版本比豆瓣多。填入一个 TMDB 的 API 密钥后，每部影片会<b>多收集最多 6 张</b>：各个语言的版本（英文版、日文版、法文版……）和没有文字的“无字版”。</p>
+        <p><b>不填完全没关系，</b>海报馆照样完整生成，只用豆瓣的海报。</p>
+        <div class="note-box">
+          <b>请先读这几点，再决定要不要做：</b>
+          <ul style="margin:8px 0 0">
+            <li>密钥要<b>你自己</b>在 TMDB 官网注册账号、自己申请。这是 TMDB 官方的要求，我们不提供、也不代办密钥。</li>
+            <li>是否申请、怎么使用，由你和 TMDB 之间约定，适用 TMDB 的<a href="https://www.themoviedb.org/api-terms-of-use" target="_blank" rel="noopener">使用条款</a>（免费密钥限个人、非商业用途）。这一步与本工具的提供者无关，相关问题请以 TMDB 官网为准。</li>
+            <li>密钥只在你自己的浏览器里、只在这一次生成中使用，不会保存，也不会发给我们或任何其他人。</li>
+            <li>TMDB 在国内访问可能不稳定。连不上时会自动跳过，只用豆瓣海报，不影响其他部分。</li>
+          </ul>
+        </div>
+        <div class="tmdb-steps">
+          <h4>如果你决定要，大致这样申请（约 5 分钟，页面以 TMDB 官网为准）</h4>
+          <ol>
+            <li>打开 <a href="https://www.themoviedb.org/signup" target="_blank" rel="noopener">themoviedb.org 注册页</a>，注册一个账号，去邮箱点验证链接。</li>
+            <li>登录后点右上角头像 →「设置 / Settings」→ 左侧「API」→ 申请一个新的 API 密钥（选 <b>Developer / 开发者</b>），同意使用条款。</li>
+            <li>按页面要求填写用途说明：用途类型可选个人（Personal），应用名称、简介如实写“个人观影记录 / 海报收藏”即可；网址一栏没有网站的话按页面提示填写。</li>
+            <li>提交后，页面上会显示 <b>API 密钥（API Key）</b>，复制它。</li>
+            <li>回到上面第 3 步：点收藏栏按钮后，在蓝色框里展开<b>「高级：加入 TMDB 海报」</b>，把密钥粘贴进去，再点“观影志 + 海报馆”。</li>
+          </ol>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="mono kicker">03 — FAQ</div>
+    <div class="mono kicker">04 — FAQ</div>
     <h2>常见问题</h2>
     <div class="faq">
       <div><h4>安全吗？我的账号会不会被拿走？</h4><p>不会。按钮只在你自己的浏览器里读取你自己的“看过”列表和影片页面，生成好的文件直接下载到你的电脑，不经过任何服务器，也碰不到你的密码。</p></div>
@@ -120,13 +177,13 @@
       <div><h4>以后看了新电影怎么更新？</h4><p>再点一次收藏栏里的按钮，下载新的一份，替换掉旧的文件夹就好。</p></div>
       <div><h4>想要一个能发给朋友的链接？</h4><p>把解压后的整个文件夹上传到任意静态网站托管（GitHub Pages、Netlify、Vercel 都免费），就会得到一个公开链接。不想折腾的话，直接发长图最省事。</p></div>
       <div><h4>进度停住了或者提示“没能完成”？</h4><p>豆瓣偶尔会限制过快的访问。等几分钟，刷新豆瓣页面，再点一次按钮即可。详情没读全也会照常生成，只是部分影片的导演、时长用简要信息代替。</p></div>
-      <div><h4>海报馆里的海报是从哪来的？</h4><p>主要来自每部影片在豆瓣的“海报”页：按豆瓣用户的喜欢排序，取最受欢迎的正式海报，并标出国家/地区版本；你打了 4 星以上的影片，还会收集几张同人与艺术再创作。你看过的影片里如果有经典名作（目前收录 46 部，如《寄生虫》《楚门的世界》《千与千寻》），海报馆会把那张有名的海报放在最前，标上“名作”，并附上我们查证过的赏析：设计师、设计故事和出处。点“名作导览”可以只看这些。如果你有 TMDB 的 API 密钥，可以在开始时展开“高级”填入，多收集各语言版和无字版。为了控制文件大小，图片缩到了适合屏幕浏览的尺寸。海报馆是全屏放映的：← → 看同一部的不同版本，↑ ↓ 换一部，空格自动播放。</p></div>
+      <div><h4>海报馆怎么看？</h4><p>海报馆是全屏放映的：<kbd>←</kbd> <kbd>→</kbd> 看同一部的不同版本，<kbd>↑</kbd> <kbd>↓</kbd> 换一部，空格自动播放，<kbd>I</kbd> 打开索引按年份、五星、有赏析筛选。海报从哪来、TMDB 密钥要不要填，见上面的<a href="#posters">「海报馆是怎么来的」</a>。</p></div>
       <div><h4>年度报告看的是哪一年？</h4><p>默认是你最近有标记的一年。想看其他年份，在 report.html 的地址末尾加上 <code>?y=2025</code> 这样的年份。</p></div>
     </div>
   </div>
 </section>
 
-<footer><div class="wrap mono">观影志 · Film Journal — 数据来自你自己的豆瓣“看过”列表，仅供个人使用 · 海报版权归各片方所有 · 与豆瓣官方无关</div></footer>
+<footer><div class="wrap mono">观影志 · Film Journal — 数据来自你自己的豆瓣“看过”列表，仅供个人使用 · 海报版权归各片方所有 · 与豆瓣官方、TMDB 官方无关</div></footer>
 
 <script>
   // The bookmarklet loads grab.js from wherever this page is hosted, so fixing grab.js updates every buyer's button.
